@@ -1,0 +1,2 @@
+class UnknownInstructionException(Exception):
+    pass
