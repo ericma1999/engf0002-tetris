@@ -1,4 +1,5 @@
 from adversary import RandomAdversary
+from arguments import parser
 from board import Board, Direction, Rotation
 from constants import BOARD_WIDTH, BOARD_HEIGHT, DEFAULT_SEED
 from player import SelectedPlayer, Player
@@ -97,8 +98,8 @@ def run(window):
     signal.signal(signal.SIGALRM, force_drop)
     signal.alarm(1)
 
-    # Fall back to user player if none selected.
-    if SelectedPlayer is None:
+    args = parser.parse_args()
+    if args.manual:
         player = UserPlayer(window)
     else:
         player = SelectedPlayer()

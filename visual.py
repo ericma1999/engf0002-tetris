@@ -1,4 +1,5 @@
 from adversary import RandomAdversary
+from arguments import parser
 from board import Board, Direction, Rotation
 from constants import BOARD_WIDTH, BOARD_HEIGHT, DEFAULT_SEED
 from player import Player, SelectedPlayer
@@ -82,9 +83,11 @@ def run():
     board = Board(BOARD_WIDTH, BOARD_HEIGHT)
     adversary = RandomAdversary(DEFAULT_SEED)
 
-    # Use the player selected if there is one, user input otherwise.
-    ActivePlayer = SelectedPlayer or UserPlayer
-    player = ActivePlayer()
+    args = parser.parse_args()
+    if args.manual:
+        player = UserPlayer()
+    else:
+        player = SelectedPlayer()
 
     pygame.init()
 
