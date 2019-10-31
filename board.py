@@ -106,11 +106,11 @@ class Block(Bitmap):
     Keeps track of the position of cells of a block.
     """
 
+    shape = None
+
     def __init__(self, shape=None):
-        if shape is None:
-            self.cells = set()
-        else:
-            self.cells = shape_to_cells[shape]
+        self.shape = shape
+        self.cells = shape_to_cells[shape]
 
     @property
     def left(self):
@@ -249,7 +249,7 @@ class Block(Bitmap):
             return
 
     def clone(self):
-        block = Block()
+        block = Block(self.shape)
         block.cells = set(self)
         return block
 
@@ -266,6 +266,7 @@ class Board(Bitmap):
     score = None
 
     falling = None
+    next = None
 
     players_turn = None
 
@@ -325,10 +326,14 @@ class Board(Bitmap):
         the shape of the newly placed block.
         """
 
-        shape = adversary.move(self)
-        self.falling = Block(shape)
+        # The next block is now falling
+        self.falling = self.next
         self.falling.center(self)
-        return shape
+
+        # Ask the adversary for a new next block.
+        self.next = Block(adversary.move(self))
+
+        return self.next.shape
 
     def run_player(self, player):
         """
@@ -371,7 +376,11 @@ class Board(Bitmap):
         by the adversary or the player respectively.
         """
 
-        # Let the adversary choose the first block.
+        # Initialize by choosing the "next" block first.
+        self.next = Block(adversary.move(self))
+        yield self.next.shape
+
+        # That block becomes the first, and we're off to the races.
         yield self.run_adversary(adversary)
 
         while self.alive:
@@ -413,4 +422,5 @@ class Board(Bitmap):
         board = Board(self.width, self.height, self.score)
         board.cells = set(self)
         board.falling = self.falling.clone()
+        board.next = self.next.clone()
         return board

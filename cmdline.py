@@ -48,9 +48,25 @@ def render(window, board):
         curses.color_pair(COLOR_WALL)
     )
 
+    # Draw the next piece
+
+    for y in range(6):
+        for x in range(4):
+            if (x, y) in board.next:
+                color = COLOR_BLOCK
+            else:
+                color = COLOR_NOTHING
+
+            window.addstr(
+                y + 1,
+                (board.width+x+3)*2,
+                f'  ',
+                curses.color_pair(color)
+            )
+
     # Draw the score line below the window.
     window.addstr(
-        y+2,
+        board.height+1,
         0,
         f'Score: {board.score} ',
         curses.color_pair(COLOR_NOTHING)
@@ -129,7 +145,10 @@ if __name__ == '__main__':
         curses.noecho()
         curses.cbreak()
 
-        window = curses.newwin(BOARD_HEIGHT + 2, (BOARD_WIDTH + 2)*2+1)
+        window = curses.newwin(
+            BOARD_HEIGHT + 2,
+            (BOARD_WIDTH + 2 + 6)*2 + 1
+        )
         window.keypad(True)
 
         # Prepare some colors to use for drawing.

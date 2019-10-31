@@ -9,6 +9,8 @@ import pygame
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
 
 CELL_WIDTH = 20
 CELL_HEIGHT = 20
@@ -44,7 +46,17 @@ def render(screen, board):
         for (x, y) in board.falling:
             sprites.add(Square(RED, x, y))
 
+    for (x, y) in board.next:
+        sprites.add(Square(GREEN, x + board.width + 2, y+1))
+
     sprites.draw(screen)
+
+    pygame.draw.line(
+        screen,
+        BLUE,
+        (board.width * CELL_WIDTH + 2, 0),
+        (board.width * CELL_WIDTH + 2, board.height * CELL_HEIGHT)
+    )
 
     # Update window title with score.
     pygame.display.set_caption(f'Score: {board.score}')
@@ -94,7 +106,7 @@ def run():
     pygame.init()
 
     screen = pygame.display.set_mode([
-        BOARD_WIDTH * CELL_WIDTH,
+        (BOARD_WIDTH + 6) * CELL_WIDTH,
         BOARD_HEIGHT * CELL_HEIGHT
     ])
 
