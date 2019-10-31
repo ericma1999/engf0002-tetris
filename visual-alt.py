@@ -1,4 +1,5 @@
 from threading import Condition, Thread
+from time import sleep
 from tkinter import Tk, Canvas, Frame, BOTH
 
 from adversary import RandomAdversary
@@ -137,7 +138,9 @@ def run():
 
     def runner():
         for move in board.run(player, adversary):
-            pass
+            # When not playing manually, allow some time to see the move.
+            if not args.manual:
+                sleep(0.1)
 
         root.destroy()
 
