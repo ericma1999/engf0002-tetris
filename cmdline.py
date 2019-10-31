@@ -15,6 +15,10 @@ COLOR_CELL = 3
 COLOR_NOTHING = 4
 
 
+def paint(window, x, y, color, count=1):
+    window.addstr(y, x*2, '  ' * count, curses.color_pair(color))
+
+
 def render(window, board):
     """
     Write a depiction of the board to standard output.
@@ -22,7 +26,7 @@ def render(window, board):
 
     for y in range(board.height):
         # Draw part of the left wall.
-        window.addstr(y, 0, '  ', curses.color_pair(COLOR_WALL))
+        paint(window, 0, y, COLOR_WALL)
 
         # Draw each individual row
         for x in range(board.width):
@@ -35,18 +39,13 @@ def render(window, board):
             else:
                 # There is nothing here.
                 color = COLOR_NOTHING
-            window.addstr(y, (x+1)*2, '  ', curses.color_pair(color))
+            paint(window, x+1, y, color)
 
         # Draw part of right wall.
-        window.addstr(y, (x+2)*2, '  ', curses.color_pair(COLOR_WALL))
+        paint(window, x+2, y, COLOR_WALL)
 
     # Draw the bottom wall
-    window.addstr(
-        y+1,
-        0,
-        '  ' * (board.width+2),
-        curses.color_pair(COLOR_WALL)
-    )
+    paint(window, 0, y+1, COLOR_WALL, count=board.width+2)
 
     # Draw the next piece
 
@@ -57,12 +56,7 @@ def render(window, board):
             else:
                 color = COLOR_NOTHING
 
-            window.addstr(
-                y + 1,
-                (board.width+x+3)*2,
-                f'  ',
-                curses.color_pair(color)
-            )
+            paint(window, board.width+x+3, y+1, color)
 
     # Draw the score line below the window.
     window.addstr(
