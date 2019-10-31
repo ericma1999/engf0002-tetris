@@ -28,7 +28,7 @@ class RemotePlayer(Player):
         raise UnknownInstructionException
 
 
-board = Board(BOARD_HEIGHT, BOARD_WIDTH)
+board = Board(BOARD_WIDTH, BOARD_HEIGHT)
 
 player = RemotePlayer()
 adversary = RandomAdversary(getenv('SEED'), BLOCK_LIMIT)
