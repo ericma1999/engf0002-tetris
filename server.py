@@ -12,6 +12,10 @@ class RemoteAdversary(Adversary):
         except EOFError:
             return
 
+        if command == 'END':
+            # Adversary reached the block limit; stop cleanly.
+            raise SystemExit
+
         try:
             return Shape(command)
         except ValueError:
