@@ -106,8 +106,11 @@ class Block(Bitmap):
     Keeps track of the position of cells of a block.
     """
 
-    def __init__(self, shape):
-        self.cells = shape_to_cells[shape]
+    def __init__(self, shape=None):
+        if shape is None:
+            self.cells = set()
+        else:
+            self.cells = shape_to_cells[shape]
 
     @property
     def left(self):
@@ -244,6 +247,11 @@ class Block(Bitmap):
         if self.collides(board):
             self.cells = old_cells
             return
+
+    def clone(self):
+        block = Block()
+        block.cells = set(self)
+        return block
 
 
 class Board(Bitmap):
@@ -397,5 +405,6 @@ class Board(Bitmap):
         """
 
         board = Board(self.width, self.height, self.score)
-        board.cells = {cell for cell in self}
+        board.cells = set(self)
+        board.falling = self.falling.clone()
         return board
