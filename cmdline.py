@@ -5,6 +5,7 @@ from player import SelectedPlayer, Player
 
 import curses
 import curses.ascii
+import signal
 
 
 COLOR_WALL = 1
@@ -70,9 +71,7 @@ class UserPlayer(Player):
     def move(self, board):
         key = self.window.getch()
 
-        if key == -1:
-            return Direction.Down
-        elif key == curses.KEY_RIGHT:
+        if key == curses.KEY_RIGHT:
             return Direction.Right
         elif key == curses.KEY_LEFT:
             return Direction.Left
@@ -89,6 +88,14 @@ class UserPlayer(Player):
 def run(window):
     board = Board(BOARD_WIDTH, BOARD_HEIGHT)
     adversary = RandomAdversary(DEFAULT_SEED)
+
+    def force_drop(signum, frame):
+        signal.alarm(1)
+        board.move(Direction.Down)
+        render(window, board)
+
+    signal.signal(signal.SIGALRM, force_drop)
+    signal.alarm(1)
 
     # Fall back to user player if none selected.
     if SelectedPlayer is None:
@@ -110,7 +117,6 @@ if __name__ == '__main__':
 
         window = curses.newwin(BOARD_HEIGHT + 2, (BOARD_WIDTH + 2)*2+1)
         window.keypad(True)
-        window.timeout(1000)
 
         # Prepare some colors to use for drawing.
         curses.init_pair(COLOR_WALL, curses.COLOR_WHITE, curses.COLOR_CYAN)
