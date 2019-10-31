@@ -106,10 +106,19 @@ def run(window):
     if args.manual:
         player = UserPlayer(window)
     else:
+        window.timeout(0)
         player = SelectedPlayer()
 
     for move in board.run(player, adversary):
         render(window, board)
+
+        if not args.manual:
+            while True:
+                key = window.getch()
+                if key == -1:
+                    break
+                elif key == curses.ascii.ESC:
+                    raise SystemExit
 
 
 if __name__ == '__main__':

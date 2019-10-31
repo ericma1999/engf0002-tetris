@@ -106,6 +106,15 @@ def run():
     for move in board.run(player, adversary):
         render(screen, board)
         pygame.display.flip()
+
+        # If we are not playing manually, clear the events.
+        if not args.manual:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE:
+                    raise SystemExit
+                elif event.type == pygame.QUIT:
+                    raise SystemExit
+
         clock.tick(FRAMES_PER_SECOND)
 
     pygame.quit()
