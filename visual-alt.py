@@ -65,7 +65,6 @@ class Visual(Frame):
         self.after(DRAW_INTERVAL, self.draw)
 
 
-
 class UserPlayer(Player):
     has_move = None
     target = None
