@@ -38,9 +38,10 @@ def render(screen, board):
     for (x, y) in board:
         sprites.add(Square(WHITE, x, y))
 
-    # Add the cells of the falling block for drawing.
-    for (x, y) in board.falling:
-        sprites.add(Square(RED, x, y))
+    if board.falling is not None:
+        # Add the cells of the falling block for drawing.
+        for (x, y) in board.falling:
+            sprites.add(Square(RED, x, y))
 
     sprites.draw(screen)
 

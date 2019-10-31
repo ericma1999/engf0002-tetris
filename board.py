@@ -337,19 +337,31 @@ class Board(Bitmap):
         indicates whether or not the current block has dropped.
         """
 
-        move = player.move(self)
+        while True:
+            moves = player.move(self)
 
-        # The player did not make a move.
-        if move is None:
-            return False, None
+            # The player did not make a move.
+            if moves is None:
+                continue
 
-        landed = False
-        if isinstance(move, Direction):
-            landed = self.falling.move(move, self)
-        elif isinstance(move, Rotation):
-            self.falling.rotate(move, self)
+            try:
+                moves = iter(moves)
+            except TypeError:
+                # We were given a single move.
+                moves = [moves]
 
-        return landed, move
+            landed = False
+            for move in moves:
+                if isinstance(move, Direction):
+                    landed = self.move(move)
+                elif isinstance(move, Rotation):
+                    self.rotate(move)
+
+                yield move
+
+                if landed:
+                    # Block has landed; stop processing moves.
+                    return
 
     def run(self, player, adversary):
         """
@@ -363,18 +375,18 @@ class Board(Bitmap):
         yield self.run_adversary(adversary)
 
         while self.alive:
-            # The player's turn starts now.
-            self.players_turn = True
+            # Ask the player for the next move(s) to make.
+            yield from self.run_player(player)
 
-            landed = False
-            while not landed:
-                # Ask the player for the next move to make.
-                landed, choice = self.run_player(player)
-                yield choice
+            # The adversary can now choose a new block.
+            yield self.run_adversary(adversary)
 
-            # End of the player's turn.
-            self.players_turn = False
+    def move(self, direction, count=1):
+        """
+        Moves the current block in the direction given.
+        """
 
+        if self.falling.move(direction, self, count):
             # The block has fallen and becomes part of the cells on the board.
             self.cells |= self.falling.cells
             self.falling = None
@@ -382,22 +394,16 @@ class Board(Bitmap):
             # Clean up any completed rows and adjust score.
             self.score += self.clean()
 
-            # The adversary can now choose a new block.
-            yield self.run_adversary(adversary)
+            return True
 
-    def move(self, direction):
-        """
-        Moves the current block in the direction given.
-        """
-
-        self.falling.move(direction, self)
+        return False
 
     def rotate(self, rotation):
         """
         Rotates the current block as requested.
         """
 
-        self.falling.rotate(rotation, self)
+        return self.falling.rotate(rotation, self)
 
     def clone(self):
         """
