@@ -82,6 +82,10 @@ class UserPlayer(Player):
             return Direction.Drop
         elif key == curses.KEY_UP:
             return Rotation.Clockwise
+        elif key == ord('z'):
+            return Rotation.Anticlockwise
+        elif key == ord('x'):
+            return Rotation.Clockwise
         elif key == curses.ascii.ESC:
             raise SystemExit
 

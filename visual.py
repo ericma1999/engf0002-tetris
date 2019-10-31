@@ -61,6 +61,8 @@ class UserPlayer(Player):
         pygame.K_DOWN: Direction.Down,
         pygame.K_SPACE: Direction.Drop,
         pygame.K_UP: Rotation.Clockwise,
+        pygame.K_z: Rotation.Anticlockwise,
+        pygame.K_x: Rotation.Clockwise,
     }
 
     def move(self, board):
