@@ -266,7 +266,7 @@ class Block(Bitmap):
             self.move(Direction.Down, board, -top)
 
         # Go back to old position if we overlap an existing cell.
-        if self.collides(board):
+        if self.collides(board) or self.bottom >= board.height:
             self.cells = old_cells
             return
 
