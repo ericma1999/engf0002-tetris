@@ -71,6 +71,15 @@ shape_to_cells = {
     },
 }
 
+shape_to_color = {
+    Shape.I: "cyan",
+    Shape.J: "blue",
+    Shape.L: "orange",
+    Shape.O: "yellow",
+    Shape.S: "green",
+    Shape.T: "magenta",
+    Shape.Z: "red",
+}
 
 class Position:
     x = None
@@ -110,6 +119,7 @@ class Block(Bitmap):
 
     def __init__(self, shape=None):
         self.shape = shape
+        self.color = shape_to_color[shape]
         self.cells = shape_to_cells[shape]
 
     @property
@@ -194,7 +204,6 @@ class Block(Bitmap):
                 return True
 
             self.cells = {(x, y+count) for (x, y) in self}
-
             # Score a point for every row a block drops.
             board.score += 1
 
@@ -275,6 +284,7 @@ class Board(Bitmap):
         self.height = height
         self.score = score
         self.cells = set()
+        self.cellcolor = {}
 
     def line_full(self, line):
         """
@@ -287,6 +297,14 @@ class Board(Bitmap):
         """
         Removes all blocks on a given line and moves down all blocks above.
         """
+
+        newcolors = {}
+        for (x,y) in self.cellcolor:
+            if y < line:
+                newcolors[(x,y+1)] = self.cellcolor[(x,y)]
+            elif y > line:
+                newcolors[(x,y)] = self.cellcolor[(x,y)]
+        self.cellcolor = newcolors
 
         self.cells = {
             (x, y) if y > line else (x, y+1)
@@ -398,11 +416,12 @@ class Board(Bitmap):
         if self.falling.move(direction, self, count):
             # The block has fallen and becomes part of the cells on the board.
             self.cells |= self.falling.cells
+            for pos in self.falling.cells:
+                self.cellcolor[pos] = self.falling.color
             self.falling = None
 
             # Clean up any completed rows and adjust score.
             self.score += self.clean()
-
             return True
 
         return False

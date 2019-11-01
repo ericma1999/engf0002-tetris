@@ -1,7 +1,6 @@
 from board import Direction, Rotation
 from random import Random
 
-
 class Player:
     def move(self, board):
         raise NotImplementedError
@@ -22,3 +21,4 @@ class RandomPlayer(Player):
 
 
 SelectedPlayer = RandomPlayer
+#SelectedPlayer = None

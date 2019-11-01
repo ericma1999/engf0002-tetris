@@ -39,15 +39,15 @@ def render(screen, board):
 
     # Add the cells already on the board for drawing.
     for (x, y) in board:
-        sprites.add(Square(WHITE, x, y))
+        sprites.add(Square(pygame.Color(board.cellcolor[(x,y)]), x, y))
 
     if board.falling is not None:
         # Add the cells of the falling block for drawing.
         for (x, y) in board.falling:
-            sprites.add(Square(RED, x, y))
+            sprites.add(Square(pygame.Color(board.falling.color), x, y))
 
     for (x, y) in board.next:
-        sprites.add(Square(GREEN, x + board.width + 2, y+1))
+        sprites.add(Square(pygame.Color(board.next.color), x + board.width + 2, y+1))
 
     sprites.draw(screen)
 
