@@ -374,7 +374,7 @@ class Board(Bitmap):
         """
 
         while True:
-            moves = player.move(self.copy())
+            moves = player.move(self.clone())
 
             try:
                 moves = iter(moves)
