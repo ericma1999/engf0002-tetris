@@ -1,6 +1,6 @@
 from threading import Condition, Thread
 from time import sleep
-from tkinter import Tk, Canvas, Frame, BOTH
+from tkinter import Tk, Canvas, Frame, BOTH, TclError
 
 from adversary import RandomAdversary
 from arguments import parser
@@ -135,7 +135,12 @@ class UserPlayer(Player):
 
 def run():
     root = Tk()
-    root.attributes('-type', 'dialog')
+
+    # Try making window a dialog if the system allows it.
+    try:
+        root.attributes('-type', 'dialog')
+    except TclError:
+        pass
 
     args = parser.parse_args()
     if args.manual:
