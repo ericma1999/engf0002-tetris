@@ -45,29 +45,30 @@ class Visual(Frame):
         )
 
     def draw(self):
-        self.canvas.delete('all')
+        with self.board.lock:
+            self.canvas.delete('all')
 
-        if self.board.falling is not None:
-            for (x, y) in self.board.falling:
-                self.draw_cell(x, y, self.board.falling.color)
+            if self.board.falling is not None:
+                for (x, y) in self.board.falling:
+                    self.draw_cell(x, y, self.board.falling.color)
 
-        for (x, y) in self.board.next:
-            self.draw_cell(
-                x + self.board.width + 2,
-                y + 1,
-                self.board.next.color
-            )
+            for (x, y) in self.board.next:
+                self.draw_cell(
+                    x + self.board.width + 2,
+                    y + 1,
+                    self.board.next.color
+                )
 
-        for (x, y) in self.board:
-            self.draw_cell(x, y, self.board.cellcolor[x, y])
+            for (x, y) in self.board:
+                self.draw_cell(x, y, self.board.cellcolor[x, y])
 
-        x = self.board.width * self.CELL_SIZE + 1
-        y = self.board.height * self.CELL_SIZE
-        self.canvas.create_line(x, 0, x, y, fill='black')
+            x = self.board.width * self.CELL_SIZE + 1
+            y = self.board.height * self.CELL_SIZE
+            self.canvas.create_line(x, 0, x, y, fill='black')
 
-        self.master.title(f'Score: {self.board.score}')
+            self.master.title(f'Score: {self.board.score}')
 
-        self.after(DRAW_INTERVAL, self.draw)
+            self.after(DRAW_INTERVAL, self.draw)
 
 
 class UserPlayer(Player):

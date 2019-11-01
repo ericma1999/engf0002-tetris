@@ -1,4 +1,5 @@
 from enum import Enum
+from threading import Lock
 
 
 class Direction(Enum):
@@ -274,6 +275,7 @@ class Board(Bitmap):
     width = None
     height = None
     score = None
+    lock = None
 
     falling = None
     next = None
@@ -286,6 +288,7 @@ class Board(Bitmap):
         self.score = score
         self.cells = set()
         self.cellcolor = {}
+        self.lock = Lock()
 
     def line_full(self, line):
         """
@@ -334,7 +337,8 @@ class Board(Bitmap):
         If this is true, then the game is over.
         """
 
-        return self.falling is None or not self.falling.collides(self)
+        with self.lock:
+            return self.falling is None or not self.falling.collides(self)
 
     def run_adversary(self, adversary):
         """
@@ -413,25 +417,27 @@ class Board(Bitmap):
         Moves the current block in the direction given.
         """
 
-        if self.falling.move(direction, self, count):
-            # The block has fallen and becomes part of the cells on the board.
-            self.cells |= self.falling.cells
-            for pos in self.falling.cells:
-                self.cellcolor[pos] = self.falling.color
-            self.falling = None
+        with self.lock:
+            if self.falling.move(direction, self, count):
+                # Block has fallen and becomes part of the cells on the board.
+                self.cells |= self.falling.cells
+                for pos in self.falling.cells:
+                    self.cellcolor[pos] = self.falling.color
+                self.falling = None
 
-            # Clean up any completed rows and adjust score.
-            self.score += self.clean()
-            return True
+                # Clean up any completed rows and adjust score.
+                self.score += self.clean()
+                return True
 
-        return False
+            return False
 
     def rotate(self, rotation):
         """
         Rotates the current block as requested.
         """
 
-        return self.falling.rotate(rotation, self)
+        with self.lock:
+            return self.falling.rotate(rotation, self)
 
     def clone(self):
         """
