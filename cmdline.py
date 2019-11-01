@@ -6,7 +6,6 @@ from player import SelectedPlayer, Player
 
 import curses
 import curses.ascii
-import signal
 
 
 COLOR_WALL = 1
@@ -104,18 +103,14 @@ class UserPlayer(Player):
     screen = None
 
     def __init__(self, window):
-        global force_down
         self.window = window
-        force_down = False
 
     def move(self, board):
-        global force_down
-        if force_down:
-            force_down = False
-            return Direction.Down
         key = self.window.getch()
 
-        if key == curses.KEY_RIGHT:
+        if key == -1:
+            return None
+        elif key == curses.KEY_RIGHT:
             return Direction.Right
         elif key == curses.KEY_LEFT:
             return Direction.Left
@@ -137,16 +132,9 @@ def run(window):
     board = Board(BOARD_WIDTH, BOARD_HEIGHT)
     adversary = RandomAdversary(DEFAULT_SEED)
 
-    def force_drop(signum, frame):
-        global force_down
-        signal.alarm(1)
-        force_down = True
-
-    signal.signal(signal.SIGALRM, force_drop)
-    signal.alarm(1)
-
     args = parser.parse_args()
     if args.manual:
+        window.timeout(1000)
         player = UserPlayer(window)
     else:
         window.timeout(0)

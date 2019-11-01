@@ -363,10 +363,6 @@ class Board(Bitmap):
         while True:
             moves = player.move(self)
 
-            # The player did not make a move.
-            if moves is None:
-                continue
-
             try:
                 moves = iter(moves)
             except TypeError:
@@ -375,15 +371,21 @@ class Board(Bitmap):
 
             landed = False
             for move in moves:
+                if move is None:
+                    # The player skipped a turn.
+                    pass
                 if isinstance(move, Direction):
                     landed = self.move(move)
                 elif isinstance(move, Rotation):
                     self.rotate(move)
 
+                if not landed:
+                    # If the block has not landed, it drops one more line.
+                    landed = self.move(Direction.Down)
+
                 yield move
 
                 if landed:
-                    # Block has landed; stop processing moves.
                     return
 
     def run(self, player, adversary):

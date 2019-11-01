@@ -109,7 +109,7 @@ class UserPlayer(Player):
 
     def drop(self):
         with self.has_move:
-            self.next_move = Direction.Down
+            self.next_move = None
             self.has_move.notify()
 
         self.target.after(DROP_INTERVAL, self.drop)

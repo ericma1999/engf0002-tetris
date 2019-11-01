@@ -78,19 +78,17 @@ class UserPlayer(Player):
     }
 
     def move(self, board):
-        move = None
-        for event in pygame.event.get():
+        while True:
+            event = pygame.event.wait()
             if event.type == pygame.QUIT:
                 raise SystemExit
             elif event.type == pygame.KEYUP:
                 if event.key in self.key_to_move:
-                    move = self.key_to_move[event.key]
+                    return self.key_to_move[event.key]
                 elif event.key == pygame.K_ESCAPE:
                     raise SystemExit
             elif event.type == EVENT_FORCE_DOWN:
-                return Direction.Down
-
-        return move
+                return None
 
 
 def run():
