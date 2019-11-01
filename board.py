@@ -313,8 +313,8 @@ class Board(Bitmap):
         Removes all blocks on a given line and moves down all blocks above.
         """
 
-        self.colors = {
-            (x, y) if y > line else (x, y-1): c
+        self.cellcolor = {
+            (x, y) if y > line else (x, y+1): c
             for (x, y), c in self.cellcolor.items() if y != line
         }
 
