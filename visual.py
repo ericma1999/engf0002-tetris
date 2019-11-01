@@ -1,7 +1,7 @@
 from adversary import RandomAdversary
 from arguments import parser
 from board import Board, Direction, Rotation
-from constants import BOARD_WIDTH, BOARD_HEIGHT, DEFAULT_SEED
+from constants import BOARD_WIDTH, BOARD_HEIGHT, DEFAULT_SEED, INTERVAL
 from player import Player, SelectedPlayer
 
 import pygame
@@ -15,7 +15,6 @@ BLUE = (0, 0, 255)
 CELL_WIDTH = 20
 CELL_HEIGHT = 20
 
-FORCE_DOWN_INTERVAL = 1000
 EVENT_FORCE_DOWN = pygame.USEREVENT + 1
 FRAMES_PER_SECOND = 60
 
@@ -117,7 +116,7 @@ def run():
     clock = pygame.time.Clock()
 
     # Set timer to force block down when no input is given.
-    pygame.time.set_timer(EVENT_FORCE_DOWN, FORCE_DOWN_INTERVAL)
+    pygame.time.set_timer(EVENT_FORCE_DOWN, INTERVAL)
 
     for move in board.run(player, adversary):
         render(screen, board)

@@ -5,11 +5,10 @@ from tkinter import Tk, Canvas, Frame, BOTH
 from adversary import RandomAdversary
 from arguments import parser
 from board import Board, Direction, Rotation
-from constants import BOARD_HEIGHT, BOARD_WIDTH, DEFAULT_SEED
+from constants import BOARD_HEIGHT, BOARD_WIDTH, DEFAULT_SEED, INTERVAL
 from player import SelectedPlayer, Player
 
 DRAW_INTERVAL = 100
-DROP_INTERVAL = 1000
 
 
 class Visual(Frame):
@@ -95,7 +94,7 @@ class UserPlayer(Player):
         target.bind("z", self.key)
         target.bind("x", self.key)
 
-        target.after(DROP_INTERVAL, self.drop)
+        target.after(INTERVAL, self.drop)
 
     def key(self, event):
         with self.has_move:
@@ -123,7 +122,7 @@ class UserPlayer(Player):
             self.next_move = None
             self.has_move.notify()
 
-        self.target.after(DROP_INTERVAL, self.drop)
+        self.target.after(INTERVAL, self.drop)
 
     def move(self, board):
         with self.has_move:

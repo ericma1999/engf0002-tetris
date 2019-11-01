@@ -1,7 +1,7 @@
 from adversary import RandomAdversary
 from arguments import parser
 from board import Board, Direction, Rotation
-from constants import BOARD_WIDTH, BOARD_HEIGHT, DEFAULT_SEED
+from constants import BOARD_WIDTH, BOARD_HEIGHT, DEFAULT_SEED, INTERVAL
 from player import SelectedPlayer, Player
 from time import sleep
 
@@ -138,7 +138,7 @@ def run(window):
 
     args = parser.parse_args()
     if args.manual:
-        window.timeout(1000)
+        window.timeout(INTERVAL)
         player = UserPlayer(window)
     else:
         window.timeout(0)
