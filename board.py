@@ -83,6 +83,17 @@ shape_to_color = {
 }
 
 
+shape_to_center = {
+    Shape.I: (0.5, 1.5),
+    Shape.J: (1, 1),
+    Shape.L: (0, 1),
+    Shape.O: (0.5, 0.5),
+    Shape.S: (1, 1),
+    Shape.T: (1, 0),
+    Shape.Z: (1, 1),
+}
+
+
 class Position:
     x = None
     y = None
@@ -118,11 +129,14 @@ class Block(Bitmap):
     """
 
     shape = None
+    color = None
+    center = None
 
     def __init__(self, shape=None):
         self.shape = shape
         self.color = shape_to_color[shape]
         self.cells = shape_to_cells[shape]
+        self.center = shape_to_center[shape]
 
     @property
     def left(self):
@@ -156,17 +170,15 @@ class Block(Bitmap):
 
         return max(y for (x, y) in self)
 
-    @property
-    def center_x(self):
-        return self.left + (self.right - self.left) // 2
-
-    def center(self, board):
+    def initialize(self, board):
         """
         Centers the block on the board.
         """
 
-        shift = board.width // 2 - self.center_x
+        center = self.left + (self.right - self.left) // 2
+        shift = board.width // 2 - center
         self.cells = {(x+shift, y) for (x, y) in self}
+        self.center = self.center[0] + shift, self.center[1]
 
     def supported(self, board):
         """
@@ -187,18 +199,25 @@ class Block(Bitmap):
         """
 
         old_cells = self.cells
+
         if direction == Direction.Right:
             self.cells = {(x+count, y) for (x, y) in self}
             if self.right >= board.width or self.collides(board):
                 # We hit something by moving; undo.
                 self.cells = old_cells
+            else:
+                self.center = self.center[0]+count, self.center[1]
             return False
+
         elif direction == Direction.Left:
             self.cells = {(x-count, y) for (x, y) in self}
             if self.left < 0 or self.collides(board):
                 # We hit something by moving; undo.
                 self.cells = old_cells
+            else:
+                self.center = self.center[0]-count, self.center[1]
             return False
+
         elif direction == Direction.Down:
             if self.supported(board):
                 # There is already something directly below the block; mark it
@@ -207,9 +226,10 @@ class Block(Bitmap):
 
             self.cells = {(x, y+count) for (x, y) in self}
             # Score a point for every row a block drops.
-            board.score += 1
-
+            board.score += count
+            self.center = self.center[0], self.center[1]+count
             return False
+
         elif direction == Direction.Drop:
             while not self.supported(board):
                 self.move(Direction.Down, board)
@@ -224,20 +244,11 @@ class Block(Bitmap):
         # Save cells so we can cancel later.
         old_cells = self.cells
 
-        # Save the top-right bound before rotation
-        (old_left, old_bottom) = (self.left, self.bottom)
-
+        cx, cy = self.center
         if rotation == Rotation.Clockwise:
-            self.cells = {(-y, x) for (x, y) in self}
+            self.cells = {(-(y-cy)+cx, x-cx+cy) for (x, y) in self}
         elif rotation == Rotation.Anticlockwise:
-            self.cells = {(y, -x) for (x, y) in self}
-
-        # Reinstate old bottom-right bound after rotation.
-        (new_left, new_bottom) = (self.left, self.bottom)
-        self.cells = {
-            (x-new_left+old_left, y-new_bottom+old_bottom)
-            for (x, y) in self
-        }
+            self.cells = {(y-cy+cx, -(x-cx)+cy) for (x, y) in self}
 
         # If block has hit left boundary, back off.
         left = self.left
@@ -348,7 +359,7 @@ class Board(Bitmap):
 
         # The next block is now falling
         self.falling = self.next
-        self.falling.center(self)
+        self.falling.initialize(self)
 
         # Ask the adversary for a new next block.
         self.next = Block(adversary.move(self))
