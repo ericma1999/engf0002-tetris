@@ -246,9 +246,9 @@ class Block(Bitmap):
 
         cx, cy = self.center
         if rotation == Rotation.Clockwise:
-            self.cells = {(-(y-cy)+cx, x-cx+cy) for (x, y) in self}
+            self.cells = {(int(-(y-cy)+cx), int(x-cx+cy)) for (x, y) in self}
         elif rotation == Rotation.Anticlockwise:
-            self.cells = {(y-cy+cx, -(x-cx)+cy) for (x, y) in self}
+            self.cells = {(int(y-cy+cx), int(-(x-cx)+cy)) for (x, y) in self}
 
         # If block has hit left boundary, back off.
         left = self.left
