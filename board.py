@@ -299,13 +299,10 @@ class Board(Bitmap):
         Removes all blocks on a given line and moves down all blocks above.
         """
 
-        newcolors = {}
-        for (x, y) in self.cellcolor:
-            if y < line:
-                newcolors[(x, y+1)] = self.cellcolor[x, y]
-            elif y > line:
-                newcolors[(x, y)] = self.cellcolor[x, y]
-        self.cellcolor = newcolors
+        self.colors = {
+            (x, y) if y > line else (x, y-1): c
+            for (x, y), c in self.cellcolor if y != line
+        }
 
         self.cells = {
             (x, y) if y > line else (x, y+1)
