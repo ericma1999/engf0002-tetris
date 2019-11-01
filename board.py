@@ -81,6 +81,7 @@ shape_to_color = {
     Shape.Z: "red",
 }
 
+
 class Position:
     x = None
     y = None
@@ -299,11 +300,11 @@ class Board(Bitmap):
         """
 
         newcolors = {}
-        for (x,y) in self.cellcolor:
+        for (x, y) in self.cellcolor:
             if y < line:
-                newcolors[(x,y+1)] = self.cellcolor[(x,y)]
+                newcolors[(x, y+1)] = self.cellcolor[x, y]
             elif y > line:
-                newcolors[(x,y)] = self.cellcolor[(x,y)]
+                newcolors[(x, y)] = self.cellcolor[x, y]
         self.cellcolor = newcolors
 
         self.cells = {

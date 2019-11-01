@@ -3,6 +3,7 @@ from arguments import parser
 from board import Board, Direction, Rotation
 from constants import BOARD_WIDTH, BOARD_HEIGHT, DEFAULT_SEED
 from player import SelectedPlayer, Player
+from time import sleep
 
 import curses
 import curses.ascii
@@ -19,13 +20,16 @@ COLOR_GREEN = 8
 COLOR_CYAN = 9
 COLOR_BLUE = 10
 COLOR_MAGENTA = 11
-COLOR_NAMES = {"red": COLOR_RED,
-               "orange": COLOR_ORANGE,
-               "yellow": COLOR_YELLOW,
-               "green": COLOR_GREEN,
-               "cyan": COLOR_CYAN,
-               "blue": COLOR_BLUE,
-               "magenta": COLOR_MAGENTA}
+COLOR_NAMES = {
+    "red": COLOR_RED,
+    "orange": COLOR_ORANGE,
+    "yellow": COLOR_YELLOW,
+    "green": COLOR_GREEN,
+    "cyan": COLOR_CYAN,
+    "blue": COLOR_BLUE,
+    "magenta": COLOR_MAGENTA
+}
+
 
 def paint(window, x, y, color, count=1):
     window.addstr(y, x*2, '  ' * count, curses.color_pair(color))
@@ -44,7 +48,7 @@ def render(window, board):
                 color = COLOR_NAMES[board.falling.color]
             elif (x, y) in board:
                 # Location is occupied by fallen block
-                color = COLOR_NAMES[board.cellcolor[(x,y)]]
+                color = COLOR_NAMES[board.cellcolor[(x, y)]]
             else:
                 # There is nothing here.
                 color = COLOR_NOTHING
@@ -70,15 +74,15 @@ def render(window, board):
     )
 
     # Draw the board frame
-    window.move(0,0)
+    window.move(0, 0)
     window.vline(curses.ACS_VLINE, board.height+2)
-    window.move(0,1)
+    window.move(0, 1)
     window.vline(curses.ACS_VLINE, board.height+1)
     window.addch(0, 0, curses.ACS_ULCORNER)
     window.addch(0, 1, curses.ACS_URCORNER)
-    window.move(0,board.width*2+2)
+    window.move(0, board.width*2+2)
     window.vline(curses.ACS_VLINE, board.height+1)
-    window.move(0,board.width*2+3)
+    window.move(0, board.width*2+3)
     window.vline(curses.ACS_VLINE, board.height+2)
     window.addch(0, board.width*2+2, curses.ACS_ULCORNER)
     window.addch(0, board.width*2+3, curses.ACS_URCORNER)
@@ -150,6 +154,7 @@ def run(window):
                     break
                 elif key == curses.ascii.ESC:
                     raise SystemExit
+            sleep(0.1)
 
 
 if __name__ == '__main__':
@@ -171,13 +176,19 @@ if __name__ == '__main__':
         curses.init_pair(COLOR_BLOCK, curses.COLOR_WHITE, curses.COLOR_RED)
         curses.init_pair(COLOR_CELL, curses.COLOR_WHITE, curses.COLOR_WHITE)
         curses.init_pair(COLOR_NOTHING, curses.COLOR_WHITE, curses.COLOR_BLACK)
+
+        # Orange is not supported.
+        curses.init_pair(COLOR_ORANGE, curses.COLOR_WHITE, curses.COLOR_WHITE)
         curses.init_pair(COLOR_RED, curses.COLOR_WHITE, curses.COLOR_RED)
-        curses.init_pair(COLOR_ORANGE, curses.COLOR_WHITE, curses.COLOR_WHITE) #orange not supported
         curses.init_pair(COLOR_YELLOW, curses.COLOR_WHITE, curses.COLOR_YELLOW)
         curses.init_pair(COLOR_GREEN, curses.COLOR_WHITE, curses.COLOR_GREEN)
         curses.init_pair(COLOR_CYAN, curses.COLOR_WHITE, curses.COLOR_CYAN)
         curses.init_pair(COLOR_BLUE, curses.COLOR_WHITE, curses.COLOR_BLUE)
-        curses.init_pair(COLOR_MAGENTA, curses.COLOR_WHITE, curses.COLOR_MAGENTA)
+        curses.init_pair(
+            COLOR_MAGENTA,
+            curses.COLOR_WHITE,
+            curses.COLOR_MAGENTA
+        )
 
         run(window)
     finally:
