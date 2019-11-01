@@ -34,6 +34,12 @@ class Visual(Frame):
 
         self.after(DRAW_INTERVAL, self.draw)
 
+        self.focus_set()
+        self.bind("<Escape>", self.quit)
+
+    def quit(self, event):
+        raise SystemExit
+
     def draw_cell(self, x, y, color):
         self.canvas.create_rectangle(
             x * self.CELL_SIZE,
