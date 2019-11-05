@@ -44,4 +44,8 @@ try:
             stderr.write(f'{board.score}\n')
             score = board.score
 except BlockLimitException:
-    print('END')
+    stderr.write('WON\n')
+    print('WON')
+else:
+    stderr.write('LOST\n')
+    print('LOST')

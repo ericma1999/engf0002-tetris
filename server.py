@@ -10,10 +10,10 @@ class RemoteAdversary(Adversary):
         try:
             command = input().strip()
         except EOFError:
-            return
+            raise SystemExit
 
-        if command == 'END':
-            # Adversary reached the block limit; stop cleanly.
+        if command == 'WON' or command == 'LOST':
+            # Game ended; stop cleanly.
             raise SystemExit
 
         try:

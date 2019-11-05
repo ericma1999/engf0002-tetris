@@ -246,9 +246,9 @@ class Block(Bitmap):
 
         cx, cy = self.center
         if rotation == Rotation.Clockwise:
-            self.cells = {(-(y-cy)+cx, x-cx+cy) for (x, y) in self}
+            self.cells = {(int(-(y-cy)+cx), int(x-cx+cy)) for (x, y) in self}
         elif rotation == Rotation.Anticlockwise:
-            self.cells = {(y-cy+cx, -(x-cx)+cy) for (x, y) in self}
+            self.cells = {(int(y-cy+cx), int(-(x-cx)+cy)) for (x, y) in self}
 
         # If block has hit left boundary, back off.
         left = self.left
@@ -313,8 +313,8 @@ class Board(Bitmap):
         Removes all blocks on a given line and moves down all blocks above.
         """
 
-        self.colors = {
-            (x, y) if y > line else (x, y-1): c
+        self.cellcolor = {
+            (x, y) if y > line else (x, y+1): c
             for (x, y), c in self.cellcolor.items() if y != line
         }
 
@@ -374,7 +374,7 @@ class Board(Bitmap):
         """
 
         while True:
-            moves = player.move(self)
+            moves = player.move(self.clone())
 
             try:
                 moves = iter(moves)
