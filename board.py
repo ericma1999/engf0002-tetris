@@ -243,6 +243,8 @@ class Block(Bitmap):
 
         # Save cells so we can cancel later.
         old_cells = self.cells
+        old_center = self.center
+        failed = False
 
         cx, cy = self.center
         if rotation == Rotation.Clockwise:
@@ -254,25 +256,34 @@ class Block(Bitmap):
         left = self.left
         if left < 0:
             self.move(Direction.Right, board, -left)
+            if self.left < 0:
+                failed = True
 
         # Same for the right boundary.
         right = self.right
         if right >= board.width:
             self.move(Direction.Left, board, right-board.width+1)
+            if self.right >= board.width:
+                failed = True
 
         # Do not move beyond the top boundary either.
         top = self.top
         if top < 0:
             self.move(Direction.Down, board, -top)
+            if self.top < 0:
+                failed = True
 
-        # Go back to old position if we overlap an existing cell.
-        if self.collides(board) or self.bottom >= board.height:
+        # Go back to old position if we overlap an existing cell, or
+        # we rotated beyond a boundary and the corrective move failed.
+        if self.collides(board) or self.bottom >= board.height or failed:
             self.cells = old_cells
+            self.center = old_center
             return
 
     def clone(self):
         block = Block(self.shape)
         block.cells = set(self)
+        block.center = self.center
         return block
 
 
