@@ -420,6 +420,16 @@ class Board(Bitmap):
                 elif isinstance(action, Rotation):
                     landed = self.rotate(action)
 
+                if landed:
+                    # A fallen block becomes part of the cells on the board.
+                    self.cells |= self.falling.cells
+                    for pos in self.falling.cells:
+                        self.cellcolor[pos] = self.falling.color
+                    self.falling = None
+
+                    # Clean up any completed rows and adjust score.
+                    self.score += self.clean()
+
                 yield action
 
                 if landed:
@@ -455,26 +465,11 @@ class Board(Bitmap):
         """
 
         with self.lock:
-            try:
-                if self.falling.move(direction, self):
-                    raise BlockFallenException
-
-                # Block has not fallen yet; apply the implicit move down.
-                if self.falling.move(Direction.Down, self):
-                    raise BlockFallenException
-
-            except BlockFallenException:
-                # Block has fallen and becomes part of the cells on the board.
-                self.cells |= self.falling.cells
-                for pos in self.falling.cells:
-                    self.cellcolor[pos] = self.falling.color
-                self.falling = None
-
-                # Clean up any completed rows and adjust score.
-                self.score += self.clean()
+            if self.falling.move(direction, self):
                 return True
 
-            return False
+            # Block has not fallen yet; apply the implicit move down.
+            return self.falling.move(Direction.Down, self)
 
     def rotate(self, rotation):
         """
