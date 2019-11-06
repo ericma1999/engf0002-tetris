@@ -98,10 +98,6 @@ class MoveFailedException(Exception):
     pass
 
 
-class BlockFallenException(Exception):
-    pass
-
-
 class Position:
     x = None
     y = None
