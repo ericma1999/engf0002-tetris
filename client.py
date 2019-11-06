@@ -9,7 +9,7 @@ from os import getenv
 
 
 class RemotePlayer(Player):
-    def move(self, board):
+    def choose_action(self, board):
         try:
             instruction = input().strip()
         except EOFError:

@@ -124,7 +124,7 @@ class UserPlayer(Player):
 
         self.target.after(INTERVAL, self.drop)
 
-    def move(self, board):
+    def choose_action(self, board):
         with self.has_move:
             self.has_move.wait()
             try:

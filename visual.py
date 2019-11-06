@@ -82,7 +82,7 @@ class UserPlayer(Player):
         pygame.K_x: Rotation.Clockwise,
     }
 
-    def move(self, board):
+    def choose_action(self, board):
         while True:
             event = pygame.event.wait()
             if event.type == pygame.QUIT:

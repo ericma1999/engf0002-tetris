@@ -387,41 +387,41 @@ class Board(Bitmap):
         self.falling.initialize(self)
 
         # Ask the adversary for a new next block.
-        self.next = Block(adversary.move(self))
+        self.next = Block(adversary.choose_block(self))
 
         return self.next.shape
 
     def run_player(self, player):
         """
-        Asks the player for the next move and executes that on the board.
+        Asks the player for the next action and executes that on the board.
         Returns a tuple of a boolean and the move made, where the boolean
         indicates whether or not the current block has dropped.
         """
 
         while True:
-            moves = player.move(self.clone())
+            actions = player.choose_action(self.clone())
 
             try:
-                moves = iter(moves)
+                actions = iter(actions)
             except TypeError:
                 # We were given a single move.
-                moves = [moves]
+                actions = [actions]
 
             landed = False
-            for move in moves:
-                if move is None:
+            for action in actions:
+                if action is None:
                     # The player skipped a turn.
                     pass
-                if isinstance(move, Direction):
-                    landed = self.move(move)
-                elif isinstance(move, Rotation):
-                    self.rotate(move)
+                if isinstance(action, Direction):
+                    landed = self.move(action)
+                elif isinstance(action, Rotation):
+                    self.rotate(action)
 
                 if not landed:
                     # If the block has not landed, it drops one more line.
                     landed = self.move(Direction.Down)
 
-                yield move
+                yield action
 
                 if landed:
                     return
@@ -435,7 +435,7 @@ class Board(Bitmap):
         """
 
         # Initialize by choosing the "next" block first.
-        self.next = Block(adversary.move(self))
+        self.next = Block(adversary.choose_block(self))
         yield self.next.shape
 
         # That block becomes the first, and we're off to the races.

@@ -4,7 +4,7 @@ from board import Shape
 
 
 class Adversary:
-    def move(self, board):
+    def choose_block(self, board):
         raise NotImplementedError
 
 
@@ -16,7 +16,7 @@ class RandomAdversary(Adversary):
         self.random = Random(seed)
         self.blocks = blocks
 
-    def move(self, board):
+    def choose_block(self, board):
         if self.blocks is not None:
             if self.blocks == 0:
                 raise BlockLimitException()

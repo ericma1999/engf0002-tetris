@@ -6,7 +6,7 @@ from player import SelectedPlayer
 
 
 class RemoteAdversary(Adversary):
-    def move(self, board):
+    def choose_block(self, board):
         try:
             command = input().strip()
         except EOFError:

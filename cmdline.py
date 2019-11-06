@@ -109,7 +109,7 @@ class UserPlayer(Player):
     def __init__(self, window):
         self.window = window
 
-    def move(self, board):
+    def choose_action(self, board):
         key = self.window.getch()
 
         if key == -1:

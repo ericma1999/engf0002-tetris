@@ -3,7 +3,7 @@ from random import Random
 
 
 class Player:
-    def move(self, board):
+    def choose_action(self, board):
         raise NotImplementedError
 
 
@@ -11,7 +11,7 @@ class RandomPlayer(Player):
     def __init__(self, seed=None):
         self.random = Random(seed)
 
-    def move(self, board):
+    def choose_action(self, board):
         return self.random.choice([
             Direction.Left,
             Direction.Right,
