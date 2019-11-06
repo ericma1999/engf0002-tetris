@@ -3,7 +3,6 @@ from arguments import parser
 from board import Board, Direction, Rotation
 from constants import BOARD_WIDTH, BOARD_HEIGHT, DEFAULT_SEED, INTERVAL
 from player import Player, SelectedPlayer
-from time import sleep
 
 import pygame
 
@@ -133,7 +132,6 @@ def run():
 
         clock.tick(FRAMES_PER_SECOND)
 
-    sleep(10)
     pygame.quit()
 
 
