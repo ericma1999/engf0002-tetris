@@ -94,6 +94,10 @@ shape_to_center = {
 }
 
 
+class MoveFailedException(Exception):
+    pass
+
+
 class Position:
     x = None
     y = None
@@ -244,41 +248,51 @@ class Block(Bitmap):
         # Save cells so we can cancel later.
         old_cells = self.cells
         old_center = self.center
-        failed = False
 
+        # Rotate around the center, which remains in place.
         cx, cy = self.center
         if rotation == Rotation.Clockwise:
             self.cells = {(int(-(y-cy)+cx), int(x-cx+cy)) for (x, y) in self}
         elif rotation == Rotation.Anticlockwise:
             self.cells = {(int(y-cy+cx), int(-(x-cx)+cy)) for (x, y) in self}
 
-        # If block has hit left boundary, back off.
-        left = self.left
-        if left < 0:
-            self.move(Direction.Right, board, -left)
-            if self.left < 0:
-                failed = True
+        try:
+            # If block has hit left boundary, back off.
+            left = self.left
+            if left < 0:
+                self.move(Direction.Right, board, -left)
+                # We could not correct; abort the move.
+                if self.left < 0:
+                    raise MoveFailedException
 
-        # Same for the right boundary.
-        right = self.right
-        if right >= board.width:
-            self.move(Direction.Left, board, right-board.width+1)
-            if self.right >= board.width:
-                failed = True
+            # Same for the right boundary.
+            right = self.right
+            if right >= board.width:
+                self.move(Direction.Left, board, right-board.width+1)
+                # We could not correct; abort moving.
+                if self.right >= board.width:
+                    raise MoveFailedException
 
-        # Do not move beyond the top boundary either.
-        top = self.top
-        if top < 0:
-            self.move(Direction.Down, board, -top)
-            if self.top < 0:
-                failed = True
+            # Do not move beyond the top boundary either.
+            top = self.top
+            if top < 0:
+                self.move(Direction.Down, board, -top)
+                # We could not correct; abort moving.
+                if self.top < 0:
+                    raise MoveFailedException
 
-        # Go back to old position if we overlap an existing cell, or
-        # we rotated beyond a boundary and the corrective move failed.
-        if self.collides(board) or self.bottom >= board.height or failed:
+            # If we rotated beyond the bottom, there is no way to correct.
+            if self.bottom >= board.height:
+                raise MoveFailedException
+
+            # Also abort if the new position overlaps an existing block.
+            if self.collides(board):
+                raise MoveFailedException
+
+        except MoveFailedException:
+            # Go back to the old position if the rotation failed.
             self.cells = old_cells
             self.center = old_center
-            return
 
     def clone(self):
         block = Block(self.shape)
