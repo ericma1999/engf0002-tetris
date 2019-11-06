@@ -98,6 +98,10 @@ class MoveFailedException(Exception):
     pass
 
 
+class BlockFallenException(Exception):
+    pass
+
+
 class Position:
     x = None
     y = None
@@ -410,16 +414,12 @@ class Board(Bitmap):
             landed = False
             for action in actions:
                 if action is None:
-                    # The player skipped a turn.
-                    pass
+                    # The player skipped a turn; apply implicit move down.
+                    landed = self.falling.move(Direction.Down, self)
                 if isinstance(action, Direction):
                     landed = self.move(action)
                 elif isinstance(action, Rotation):
-                    self.rotate(action)
-
-                if not landed:
-                    # If the block has not landed, it drops one more line.
-                    landed = self.move(Direction.Down)
+                    landed = self.rotate(action)
 
                 yield action
 
@@ -448,13 +448,23 @@ class Board(Bitmap):
             # The adversary can now choose a new block.
             yield self.run_adversary(adversary)
 
-    def move(self, direction, count=1):
+    def move(self, direction):
         """
-        Moves the current block in the direction given.
+        Moves the current block in the direction given, and applies the
+        implicit move down as well. Returns True if either this move or the
+        subsequent move down caused the block to be dropped, False otherwise.
         """
 
         with self.lock:
-            if self.falling.move(direction, self, count):
+            try:
+                if self.falling.move(direction, self):
+                    raise BlockFallenException
+
+                # Block has not fallen yet; apply the implicit move down.
+                if self.falling.move(Direction.Down, self):
+                    raise BlockFallenException
+
+            except BlockFallenException:
                 # Block has fallen and becomes part of the cells on the board.
                 self.cells |= self.falling.cells
                 for pos in self.falling.cells:
@@ -469,11 +479,16 @@ class Board(Bitmap):
 
     def rotate(self, rotation):
         """
-        Rotates the current block as requested.
+        Rotates the current block as requested, and applies the implicit move
+        down as well. Returns True if the subsequent move down caused the block
+        to be dropped, False otherwise.
         """
 
         with self.lock:
-            return self.falling.rotate(rotation, self)
+            self.falling.rotate(rotation, self)
+
+            # Apply the implicit move down.
+            return self.falling.move(Direction.Down, self)
 
     def clone(self):
         """
