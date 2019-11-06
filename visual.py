@@ -1,138 +1,173 @@
+from threading import Condition, Thread
+from time import sleep
+from tkinter import Tk, Canvas, Frame, BOTH, TclError
+
 from adversary import RandomAdversary
 from arguments import parser
 from board import Board, Direction, Rotation
-from constants import BOARD_WIDTH, BOARD_HEIGHT, DEFAULT_SEED, INTERVAL
-from player import Player, SelectedPlayer
+from constants import BOARD_HEIGHT, BOARD_WIDTH, DEFAULT_SEED, INTERVAL
+from player import SelectedPlayer, Player
 
-import pygame
-
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-RED = (255, 0, 0)
-GREEN = (0, 255, 0)
-BLUE = (0, 0, 255)
-
-CELL_WIDTH = 20
-CELL_HEIGHT = 20
-
-EVENT_FORCE_DOWN = pygame.USEREVENT + 1
-FRAMES_PER_SECOND = 60
+DRAW_INTERVAL = 100
 
 
-class Square(pygame.sprite.Sprite):
-    def __init__(self, color, x, y):
+class Visual(Frame):
+    board = None
+    canvas = None
+
+    CELL_SIZE = 20
+
+    def __init__(self, board):
         super().__init__()
 
-        self.image = pygame.Surface([CELL_WIDTH, CELL_HEIGHT])
-        self.image.fill(color)
+        self.board = board
 
-        self.rect = self.image.get_rect()
-        self.rect.x = x * CELL_WIDTH
-        self.rect.y = y * CELL_HEIGHT
-
-
-def render(screen, board):
-    screen.fill(BLACK)
-
-    sprites = pygame.sprite.Group()
-
-    # Add the cells already on the board for drawing.
-    for (x, y) in board:
-        sprites.add(Square(pygame.Color(board.cellcolor[x, y]), x, y))
-
-    if board.falling is not None:
-        # Add the cells of the falling block for drawing.
-        for (x, y) in board.falling:
-            sprites.add(Square(pygame.Color(board.falling.color), x, y))
-
-    for (x, y) in board.next:
-        sprites.add(
-            Square(
-                pygame.Color(board.next.color),
-                x + board.width + 2,
-                y+1
-            )
+        self.master.geometry(
+            f'{(BOARD_WIDTH+6)*self.CELL_SIZE}x' +
+            f'{BOARD_HEIGHT*self.CELL_SIZE}'
         )
 
-    sprites.draw(screen)
+        self.pack(fill=BOTH, expand=1)
+        self.canvas = Canvas(self)
+        self.canvas.pack(fill=BOTH, expand=1)
 
-    pygame.draw.line(
-        screen,
-        BLUE,
-        (board.width * CELL_WIDTH + 2, 0),
-        (board.width * CELL_WIDTH + 2, board.height * CELL_HEIGHT)
-    )
+        self.after(DRAW_INTERVAL, self.draw)
 
-    # Update window title with score.
-    pygame.display.set_caption(f'Score: {board.score}')
+        self.focus_set()
+        self.bind("<Escape>", self.quit)
+
+    def quit(self, event):
+        raise SystemExit
+
+    def draw_cell(self, x, y, color):
+        self.canvas.create_rectangle(
+            x * self.CELL_SIZE,
+            y * self.CELL_SIZE,
+            (x+1) * self.CELL_SIZE,
+            (y+1) * self.CELL_SIZE,
+            fill=color,
+            outline=color,
+        )
+
+    def draw(self):
+        with self.board.lock:
+            self.canvas.delete('all')
+
+            if self.board.falling is not None:
+                for (x, y) in self.board.falling:
+                    self.draw_cell(x, y, self.board.falling.color)
+
+            for (x, y) in self.board.next:
+                self.draw_cell(
+                    x + self.board.width + 2,
+                    y + 1,
+                    self.board.next.color
+                )
+
+            for (x, y) in self.board:
+                self.draw_cell(x, y, self.board.cellcolor[x, y])
+
+            x = self.board.width * self.CELL_SIZE + 1
+            y = self.board.height * self.CELL_SIZE
+            self.canvas.create_line(x, 0, x, y, fill='black')
+
+            self.master.title(f'Score: {self.board.score}')
+
+            self.after(DRAW_INTERVAL, self.draw)
 
 
 class UserPlayer(Player):
-    """
-    A simple user player that reads moves from the command line.
-    """
+    has_move = None
+    target = None
+    next_move = None
 
-    key_to_move = {
-        pygame.K_RIGHT: Direction.Right,
-        pygame.K_LEFT: Direction.Left,
-        pygame.K_DOWN: Direction.Down,
-        pygame.K_SPACE: Direction.Drop,
-        pygame.K_UP: Rotation.Clockwise,
-        pygame.K_z: Rotation.Anticlockwise,
-        pygame.K_x: Rotation.Clockwise,
-    }
+    def __init__(self, target):
+        self.has_move = Condition()
+        self.target = target
+
+        target.focus_set()
+        target.bind("<Up>", self.key)
+        target.bind("<Right>", self.key)
+        target.bind("<Down>", self.key)
+        target.bind("<Left>", self.key)
+        target.bind("<space>", self.key)
+        target.bind("z", self.key)
+        target.bind("x", self.key)
+
+        target.after(INTERVAL, self.drop)
+
+    def key(self, event):
+        with self.has_move:
+            if event.keysym == 'Up':
+                self.next_move = Rotation.Clockwise
+            elif event.keysym == 'Right':
+                self.next_move = Direction.Right
+            elif event.keysym == 'Down':
+                self.next_move = Direction.Down
+            elif event.keysym == 'Left':
+                self.next_move = Direction.Left
+            elif event.keysym == 'space':
+                self.next_move = Direction.Drop
+            elif event.keysym == 'z':
+                self.next_move = Rotation.Clockwise
+            elif event.keysym == 'x':
+                self.next_move = Rotation.Anticlockwise
+            else:
+                return
+
+            self.has_move.notify()
+
+    def drop(self):
+        with self.has_move:
+            self.next_move = None
+            self.has_move.notify()
+
+        self.target.after(INTERVAL, self.drop)
 
     def choose_action(self, board):
-        while True:
-            event = pygame.event.wait()
-            if event.type == pygame.QUIT:
-                raise SystemExit
-            elif event.type == pygame.KEYUP:
-                if event.key in self.key_to_move:
-                    return self.key_to_move[event.key]
-                elif event.key == pygame.K_ESCAPE:
-                    raise SystemExit
-            elif event.type == EVENT_FORCE_DOWN:
-                return None
+        with self.has_move:
+            self.has_move.wait()
+            try:
+                return self.next_move
+            finally:
+                self.next_move = None
 
 
 def run():
-    board = Board(BOARD_WIDTH, BOARD_HEIGHT)
-    adversary = RandomAdversary(DEFAULT_SEED)
+    root = Tk()
+
+    # Try making window a dialog if the system allows it.
+    try:
+        root.attributes('-type', 'dialog')
+    except TclError:
+        pass
 
     args = parser.parse_args()
     if args.manual:
-        player = UserPlayer()
+        player = UserPlayer(root)
     else:
         player = SelectedPlayer()
 
-    pygame.init()
+    adversary = RandomAdversary(DEFAULT_SEED)
+    board = Board(BOARD_WIDTH, BOARD_HEIGHT)
 
-    screen = pygame.display.set_mode([
-        (BOARD_WIDTH + 6) * CELL_WIDTH,
-        BOARD_HEIGHT * CELL_HEIGHT
-    ])
+    def runner():
+        for move in board.run(player, adversary):
+            # When not playing manually, allow some time to see the move.
+            if not args.manual:
+                sleep(0.1)
 
-    clock = pygame.time.Clock()
+        root.destroy()
 
-    # Set timer to force block down when no input is given.
-    pygame.time.set_timer(EVENT_FORCE_DOWN, INTERVAL)
+    Visual(board)
 
-    for move in board.run(player, adversary):
-        render(screen, board)
-        pygame.display.flip()
+    background = Thread(target=runner)
+    background.daemon = True
+    background.start()
 
-        # If we are not playing manually, clear the events.
-        if not args.manual:
-            for event in pygame.event.get():
-                if event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE:
-                    raise SystemExit
-                elif event.type == pygame.QUIT:
-                    raise SystemExit
+    root.mainloop()
 
-        clock.tick(FRAMES_PER_SECOND)
-
-    pygame.quit()
+    raise SystemExit
 
 
 if __name__ == '__main__':
