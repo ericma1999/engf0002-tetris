@@ -96,6 +96,14 @@ class UserPlayer(Player):
                 return None
 
 
+def check_stop():
+    for event in pygame.event.get():
+        if event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE:
+            raise SystemExit
+        elif event.type == pygame.QUIT:
+            raise SystemExit
+
+
 def run():
     board = Board(BOARD_WIDTH, BOARD_HEIGHT)
     adversary = RandomAdversary(DEFAULT_SEED)
@@ -124,15 +132,12 @@ def run():
 
         # If we are not playing manually, clear the events.
         if not args.manual:
-            for event in pygame.event.get():
-                if event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE:
-                    raise SystemExit
-                elif event.type == pygame.QUIT:
-                    raise SystemExit
+            check_stop()
 
         clock.tick(FRAMES_PER_SECOND)
 
-    pygame.quit()
+    while True:
+        check_stop()
 
 
 if __name__ == '__main__':

@@ -157,8 +157,6 @@ def run():
             if not args.manual:
                 sleep(0.1)
 
-        root.destroy()
-
     Visual(board)
 
     background = Thread(target=runner)

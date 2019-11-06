@@ -156,6 +156,9 @@ def run(window):
                     raise SystemExit
             sleep(0.1)
 
+    window.timeout(-1)
+    window.getch()
+
 
 if __name__ == '__main__':
     try:
