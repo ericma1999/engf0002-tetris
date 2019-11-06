@@ -414,8 +414,7 @@ class Board(Bitmap):
             landed = False
             for action in actions:
                 if action is None:
-                    # The player skipped a turn; apply implicit move down.
-                    landed = self.falling.move(Direction.Down, self)
+                    landed = self.skip()
                 if isinstance(action, Direction):
                     landed = self.move(action)
                 elif isinstance(action, Rotation):
@@ -488,6 +487,15 @@ class Board(Bitmap):
             self.falling.rotate(rotation, self)
 
             # Apply the implicit move down.
+            return self.falling.move(Direction.Down, self)
+
+    def skip(self):
+        """
+        Skips the current turn, and applies the implicit move down. Returns
+        True if this move caused the block to be dropped, False otherwise.
+        """
+
+        with self.lock:
             return self.falling.move(Direction.Down, self)
 
     def clone(self):
