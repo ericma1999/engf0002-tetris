@@ -416,15 +416,6 @@ class Board(Bitmap):
                 elif isinstance(action, Rotation):
                     landed = self.rotate(action)
 
-                if landed:
-                    # A fallen block becomes part of the cells on the board.
-                    self.cells |= self.falling.cells
-                    for pos in self.falling.cells:
-                        self.cellcolor[pos] = self.falling.color
-                    self.falling = None
-
-                    # Clean up any completed rows and adjust score.
-                    self.score += self.clean()
 
                 yield action
 
@@ -453,6 +444,15 @@ class Board(Bitmap):
             # The adversary can now choose a new block.
             yield self.run_adversary(adversary)
 
+    def land_block(self):
+        self.cells |= self.falling.cells
+        for pos in self.falling.cells:
+            self.cellcolor[pos] = self.falling.color
+        self.falling = None
+
+        # Clean up any completed rows and adjust score.
+        self.score += self.clean()
+
     def move(self, direction):
         """
         Moves the current block in the direction given, and applies the
@@ -462,10 +462,15 @@ class Board(Bitmap):
 
         with self.lock:
             if self.falling.move(direction, self):
+                self.land_block()
+                    # A fallen block becomes part of the cells on the board.
                 return True
 
             # Block has not fallen yet; apply the implicit move down.
-            return self.falling.move(Direction.Down, self)
+            res = self.falling.move(Direction.Down, self)
+            if res:
+                self.land_block()
+            return res
 
     def rotate(self, rotation):
         """
@@ -478,7 +483,10 @@ class Board(Bitmap):
             self.falling.rotate(rotation, self)
 
             # Apply the implicit move down.
-            return self.falling.move(Direction.Down, self)
+            res = self.falling.move(Direction.Down, self)
+            if res:
+                self.land_block()
+            return res
 
     def skip(self):
         """
@@ -487,7 +495,10 @@ class Board(Bitmap):
         """
 
         with self.lock:
-            return self.falling.move(Direction.Down, self)
+            res = self.falling.move(Direction.Down, self)
+            if res:
+                self.land_block()
+            return res
 
     def clone(self):
         """
