@@ -45,14 +45,15 @@ def render(screen, board):
         for (x, y) in board.falling:
             sprites.add(Square(pygame.Color(board.falling.color), x, y))
 
-    for (x, y) in board.next:
-        sprites.add(
-            Square(
-                pygame.Color(board.next.color),
-                x + board.width + 2,
-                y+1
+    if board.next is not None:
+        for (x, y) in board.next:
+            sprites.add(
+                Square(
+                    pygame.Color(board.next.color),
+                    x + board.width + 2,
+                    y+1
+                )
             )
-        )
 
     sprites.draw(screen)
 

@@ -55,15 +55,15 @@ def render(window, board):
             paint(window, x+1, y, color)
 
     # Draw the next piece
+    if board.next is not None:
+        for y in range(6):
+            for x in range(4):
+                if (x, y) in board.next:
+                    color = COLOR_NAMES[board.next.color]
+                else:
+                    color = COLOR_NOTHING
 
-    for y in range(6):
-        for x in range(4):
-            if (x, y) in board.next:
-                color = COLOR_NAMES[board.next.color]
-            else:
-                color = COLOR_NOTHING
-
-            paint(window, board.width+x+3, y+1, color)
+                paint(window, board.width+x+3, y+1, color)
 
     # Draw the score line below the window.
     window.addstr(

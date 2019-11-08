@@ -57,12 +57,13 @@ class Visual(Frame):
                 for (x, y) in self.board.falling:
                     self.draw_cell(x, y, self.board.falling.color)
 
-            for (x, y) in self.board.next:
-                self.draw_cell(
-                    x + self.board.width + 2,
-                    y + 1,
-                    self.board.next.color
-                )
+            if self.board.next is not None:
+                for (x, y) in self.board.next:
+                    self.draw_cell(
+                        x + self.board.width + 2,
+                        y + 1,
+                        self.board.next.color
+                    )
 
             for (x, y) in self.board:
                 self.draw_cell(x, y, self.board.cellcolor[x, y])
