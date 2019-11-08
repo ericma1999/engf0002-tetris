@@ -416,7 +416,6 @@ class Board(Bitmap):
                 elif isinstance(action, Rotation):
                     landed = self.rotate(action)
 
-
                 yield action
 
                 if landed:
@@ -445,6 +444,7 @@ class Board(Bitmap):
             yield self.run_adversary(adversary)
 
     def land_block(self):
+        # A fallen block becomes part of the cells on the board.
         self.cells |= self.falling.cells
         for pos in self.falling.cells:
             self.cellcolor[pos] = self.falling.color
@@ -463,14 +463,14 @@ class Board(Bitmap):
         with self.lock:
             if self.falling.move(direction, self):
                 self.land_block()
-                    # A fallen block becomes part of the cells on the board.
                 return True
 
             # Block has not fallen yet; apply the implicit move down.
-            res = self.falling.move(Direction.Down, self)
-            if res:
+            if self.falling.move(Direction.Down, self):
                 self.land_block()
-            return res
+                return True
+            else:
+                return False
 
     def rotate(self, rotation):
         """
@@ -483,10 +483,11 @@ class Board(Bitmap):
             self.falling.rotate(rotation, self)
 
             # Apply the implicit move down.
-            res = self.falling.move(Direction.Down, self)
-            if res:
+            if self.falling.move(Direction.Down, self):
                 self.land_block()
-            return res
+                return True
+            else:
+                return False
 
     def skip(self):
         """
