@@ -376,19 +376,20 @@ class Board(Bitmap):
         with self.lock:
             return self.falling is None or not self.falling.collides(self)
 
+    def place_next_block(self):
+        # The next block is now falling
+        self.falling = self.next
+        self.falling.initialize(self)
+        self.next = None
+
     def run_adversary(self, adversary):
         """
         Asks the adversary for a new block and places it on the board. Returns
         the shape of the newly placed block.
         """
 
-        # The next block is now falling
-        self.falling = self.next
-        self.falling.initialize(self)
-
         # Ask the adversary for a new next block.
         self.next = Block(adversary.choose_block(self))
-
         return self.next.shape
 
     def run_player(self, player):
@@ -430,18 +431,21 @@ class Board(Bitmap):
         """
 
         # Initialize by choosing the "next" block first.
-        self.next = Block(adversary.choose_block(self))
-        yield self.next.shape
-
-        # That block becomes the first, and we're off to the races.
         yield self.run_adversary(adversary)
 
-        while self.alive:
+        # Place this block on the board
+        self.place_next_block()
+
+        while True:
+            # The adversary can now choose a new next block.
+            yield self.run_adversary(adversary)
+
+            # The block may have caused the end of the game.
+            if not self.alive:
+                return
+
             # Ask the player for the next move(s) to make.
             yield from self.run_player(player)
-
-            # The adversary can now choose a new block.
-            yield self.run_adversary(adversary)
 
     def land_block(self):
         # A fallen block becomes part of the cells on the board.
@@ -452,6 +456,8 @@ class Board(Bitmap):
 
         # Clean up any completed rows and adjust score.
         self.score += self.clean()
+
+        self.place_next_block()
 
     def move(self, direction):
         """
