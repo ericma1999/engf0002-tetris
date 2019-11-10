@@ -34,3 +34,5 @@ for move in board.run(player, adversary):
         print(move.value)
     elif isinstance(move, Rotation):
         print(move.value)
+    elif move is None:
+        print('SKIP')

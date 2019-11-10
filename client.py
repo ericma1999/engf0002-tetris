@@ -15,6 +15,9 @@ class RemotePlayer(Player):
         except EOFError:
             return
 
+        if instruction == 'SKIP':
+            return None
+
         try:
             return Direction(instruction)
         except ValueError:
