@@ -1,6 +1,6 @@
 from adversary import RandomAdversary
 from board import Board, Direction, Rotation, Shape
-from constants import BOARD_HEIGHT, BOARD_WIDTH, BLOCK_LIMIT
+from constants import BOARD_HEIGHT, BOARD_WIDTH, BLOCK_LIMIT, PREFIX
 from exceptions import UnknownInstructionException, BlockLimitException
 from player import Player
 
@@ -10,10 +10,16 @@ from os import getenv
 
 class RemotePlayer(Player):
     def choose_action(self, board):
-        try:
-            instruction = input().strip()
-        except EOFError:
-            return
+        while True:
+            try:
+                instruction = input().strip()
+            except EOFError:
+                return
+
+            if instruction.startswith(PREFIX):
+                break
+
+        instruction = instruction[len(PREFIX)+1:]
 
         if instruction == 'SKIP':
             return None
@@ -41,14 +47,14 @@ score = 0
 try:
     for move in board.run(player, adversary):
         if isinstance(move, Shape):
-            print(move.value)
+            print(f'{PREFIX} {move.value}')
 
         if board.score != score:
             stderr.write(f'{board.score}\n')
             score = board.score
 except BlockLimitException:
     stderr.write('WON\n')
-    print('WON')
+    print(f'{PREFIX} WON')
 else:
     stderr.write('LOST\n')
-    print('LOST')
+    print(f'{PREFIX} LOST')
