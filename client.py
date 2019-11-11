@@ -14,7 +14,7 @@ class RemotePlayer(Player):
             try:
                 instruction = input().strip()
             except EOFError:
-                return
+                raise UnknownInstructionException
 
             if instruction.startswith(PREFIX):
                 break
