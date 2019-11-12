@@ -1,5 +1,6 @@
 from enum import Enum
 from threading import Lock
+from exceptions import NoBlockException
 
 
 class Direction(Enum):
@@ -379,7 +380,11 @@ class Board(Bitmap):
     def place_next_block(self):
         # The next block is now falling
         self.falling = self.next
-        self.falling.initialize(self)
+
+        # Place the next block, if it exists.
+        if self.falling is not None:
+            self.falling.initialize(self)
+
         self.next = None
 
     def run_adversary(self, adversary):
@@ -466,6 +471,9 @@ class Board(Bitmap):
         subsequent move down caused the block to be dropped, False otherwise.
         """
 
+        if self.falling is None:
+            raise NoBlockException
+
         with self.lock:
             if self.falling.move(direction, self):
                 self.land_block()
@@ -485,6 +493,9 @@ class Board(Bitmap):
         to be dropped, False otherwise.
         """
 
+        if self.falling is None:
+            raise NoBlockException
+
         with self.lock:
             self.falling.rotate(rotation, self)
 
@@ -501,6 +512,9 @@ class Board(Bitmap):
         True if this move caused the block to be dropped, False otherwise.
         """
 
+        if self.falling is None:
+            raise NoBlockException
+
         with self.lock:
             res = self.falling.move(Direction.Down, self)
             if res:
@@ -514,6 +528,13 @@ class Board(Bitmap):
 
         board = Board(self.width, self.height, self.score)
         board.cells = set(self)
-        board.falling = self.falling.clone()
-        board.next = self.next.clone()
+
+        # Copy the falling block, if any.
+        if self.falling is not None:
+            board.falling = self.falling.clone()
+
+        # Copy the next block, if any.
+        if self.next is not None:
+            board.next = self.next.clone()
+
         return board
