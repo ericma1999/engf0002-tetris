@@ -69,47 +69,53 @@ class MyPlayer(Player):
         total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board)
         return total
 
+
+    def try_rotation(self,rotation, board):
+        for _ in range(rotation):
+                    try:
+                        board.rotate(Rotation.Anticlockwise)
+                    except NoBlockException:
+                        pass
+    def try_moves(self, moves, board):
+    # 4 here since the board spawns the shape at 6 and not in center ***
+            move = 4 - moves
+            if (move >= 0):
+                for _ in range(move):
+                    try:
+                        board.move(Direction.Right)
+                    except NoBlockException:
+                        pass
+            else:
+                for _ in range(abs(move)):
+                    try:
+                        board.move(Direction.Left)
+                    except NoBlockException:
+                        pass
+            try:
+                board.move(Direction.Drop)
+            except NoBlockException:
+                pass
+
     def simulate_best_position(self, board):
         score = None
-        first_board = None
         for rotation in range(4):
             for horizontal_moves in range(board.width):
                 cloned_board = board.clone()
-                for _ in range(rotation):
-                    try:
-                        cloned_board.rotate(Rotation.Anticlockwise)
-                    except NoBlockException:
-                        pass
-                # 4 here since the board spawns the shape at 6 and not in center ***
-                move = 4 - horizontal_moves
-                if (move >= 0):
-                    for _ in range(move):
-                        try:
-                            cloned_board.move(Direction.Right)
-                        except NoBlockException:
-                            pass
-                else:
-                    for _ in range(abs(move)):
-                        try:
-                            cloned_board.move(Direction.Left)
-                        except NoBlockException:
-                            pass
-                try:
-                    cloned_board.move(Direction.Drop)
-                except NoBlockException:
-                    pass
+                self.try_rotation(rotation, cloned_board)
+                self.try_moves(horizontal_moves, cloned_board)
 
                 calculated_score = self.calc_score(board,cloned_board)
 
                 if (score is None):
                     score = calculated_score
                     self.best_rotation_position = rotation
-                    self.best_horizontal_position = move
+                    self.best_horizontal_position = 4 - horizontal_moves
                 
                 if (calculated_score > score):
+                    best_board = cloned_board
                     self.best_rotation_position = rotation
                     score = calculated_score
-                    self.best_horizontal_position = move
+                    self.best_horizontal_position = 4 - horizontal_moves
     
     def generate_moves(self):
         generated_moves = []
