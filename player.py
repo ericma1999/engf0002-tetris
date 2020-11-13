@@ -3,18 +3,17 @@ from random import Random
 from time import sleep
 from exceptions import NoBlockException
 
-
+# references
+# https://codemyroad.wordpress.com/2013/04/14/tetris-ai-the-near-perfect-player/
 class Player:
     def choose_action(self, board):
         raise NotImplementedError
 class MyPlayer(Player):
     # heuristic constants
     heightConstant = -0.710066
-    linesConstant = 1.260666
+    linesConstant = 0.860666
     holesConstant = -0.35663
     bumpinessConstant = -0.184483
-
-    moves = 0
 
     best_horizontal_position = None
     best_rotation_position = None
@@ -51,11 +50,11 @@ class MyPlayer(Player):
             complete_line += 4
         elif score >= 800:
             complete_line += 3
-        # elif score >= 400:
-        #     complete_line += 2
-        # elif score >= 100:
-        #     complete_line += 1
-        return complete_line * self.linesConstant * self.moves
+        elif score >= 400:
+            complete_line += 2
+        elif score >= 100:
+            complete_line += 1
+        return complete_line * self.linesConstant
 
     
     def check_holes(self, board):
@@ -101,7 +100,6 @@ class MyPlayer(Player):
 
     def simulate_best_position(self, board):
         score = None
-        self.moves += 1
         print(self.moves)
         for rotation in range(4):
             for horizontal_moves in range(board.width):
