@@ -100,7 +100,6 @@ class MyPlayer(Player):
 
     def simulate_best_position(self, board):
         score = None
-        print(self.moves)
         for rotation in range(4):
             for horizontal_moves in range(board.width):
                 cloned_board = board.clone()
