@@ -7,13 +7,10 @@ from exceptions import NoBlockException
 class Player:
     def choose_action(self, board):
         raise NotImplementedError
-
-
-
 class MyPlayer(Player):
     # heuristic constants
     heightConstant = -0.510066
-    linesConstant = 0.960666
+    linesConstant = 1.260666
     holesConstant = -0.35663
     bumpinessConstant = -0.184483
 
@@ -74,7 +71,7 @@ class MyPlayer(Player):
 
     def simulate_best_position(self, board):
         score = None
-
+        first_board = None
         for rotation in range(4):
             for horizontal_moves in range(board.width):
                 cloned_board = board.clone()
