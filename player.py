@@ -12,8 +12,9 @@ class MyPlayer(Player):
     heightConstant = -0.710066
     linesConstant = 1.260666
     holesConstant = -0.35663
-    meanHeightConstant = -0.66
     bumpinessConstant = -0.184483
+
+    moves = 0
 
     best_horizontal_position = None
     best_rotation_position = None
@@ -31,9 +32,6 @@ class MyPlayer(Player):
                     height = abs(board.height - y)
                     columns[x] = height
         return columns
-
-    def check_mean_height(self,board):
-        return sum(self.generate_column_height(board)) / 10 * self.meanHeightConstant
 
     def check_height(self,board):
         return sum(self.generate_column_height(board)) * self.heightConstant
@@ -57,7 +55,7 @@ class MyPlayer(Player):
             complete_line += 2
         elif score >= 100:
             complete_line += 1
-        return complete_line * self.linesConstant
+        return complete_line * self.linesConstant * self.moves
 
     
     def check_holes(self, board):
@@ -103,6 +101,7 @@ class MyPlayer(Player):
 
     def simulate_best_position(self, board):
         score = None
+        self.moves += 1
         for rotation in range(4):
             for horizontal_moves in range(board.width):
                 cloned_board = board.clone()
