@@ -75,10 +75,10 @@ class MyPlayer(Player):
     def simulate_best_position(self, board):
         score = None
 
-        for rotation in range(0, 4):
-            for horizontal_moves in range(0, board.width):
+        for rotation in range(4):
+            for horizontal_moves in range(board.width):
                 cloned_board = board.clone()
-                for _ in range(0, rotation):
+                for _ in range(rotation):
                     try:
                         cloned_board.rotate(Rotation.Anticlockwise)
                     except NoBlockException:
@@ -86,13 +86,13 @@ class MyPlayer(Player):
                 # 4 here since the board spawns the shape at 6 and not in center ***
                 move = 4 - horizontal_moves
                 if (move >= 0):
-                    for _ in range(0, move):
+                    for _ in range(move):
                         try:
                             cloned_board.move(Direction.Right)
                         except NoBlockException:
                             pass
                 else:
-                    for _ in range(0, abs(move)):
+                    for _ in range(abs(move)):
                         try:
                             cloned_board.move(Direction.Left)
                         except NoBlockException:
@@ -116,13 +116,13 @@ class MyPlayer(Player):
     
     def generate_moves(self):
         generated_moves = []
-        for _ in range(0, self.best_rotation_position):
+        for _ in range(self.best_rotation_position):
             generated_moves.append(Rotation.Anticlockwise)
         if (self.best_horizontal_position < 0):
-            for _ in range(0, abs(self.best_horizontal_position)):
+            for _ in range(abs(self.best_horizontal_position)):
                 generated_moves.append(Direction.Left)
         else:
-            for _ in range(0, self.best_horizontal_position):
+            for _ in range(self.best_horizontal_position):
                 generated_moves.append(Direction.Right)
         generated_moves.append(Direction.Drop)
 
