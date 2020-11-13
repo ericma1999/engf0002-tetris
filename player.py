@@ -9,7 +9,7 @@ class Player:
         raise NotImplementedError
 class MyPlayer(Player):
     # heuristic constants
-    heightConstant = -0.510066
+    heightConstant = -0.710066
     linesConstant = 1.260666
     holesConstant = -0.35663
     meanHeightConstant = -0.66
@@ -51,16 +51,12 @@ class MyPlayer(Player):
         # points given
         if score >= 1600:
             complete_line += 4
-            return complete_line * self.linesConstant * 2
         elif score >= 800:
             complete_line += 3
-            return complete_line * (self.linesConstant / 2)
         elif score >= 400:
             complete_line += 2
-            return complete_line * (self.linesConstant / 3)
         elif score >= 100:
             complete_line += 1
-            return complete_line * (self.linesConstant / 4)
         return complete_line * self.linesConstant
 
     
