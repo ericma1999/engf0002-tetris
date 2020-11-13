@@ -64,7 +64,7 @@ class MyPlayer(Player):
         for x in range(board.width):
             for y in range(board.height):
                 if (x, y) not in board.cells:
-                    if (x + 2,y) in board.cells and (x - 2,y) in board.cells and (x, y+1) in board.cells and (x, y-1) in board.cells:
+                    if (x + 1,y) in board.cells and (x - 1,y) in board.cells and (x, y+1) in board.cells and (x, y-1) in board.cells:
                         holes += 1
         return self.holesConstant * holes
 
