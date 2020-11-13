@@ -82,11 +82,14 @@ class MyPlayer(Player):
                 move = 5 - horizontal_moves
                 if (move > 0):
                     for _ in range(0, move):
-                        cloned_board.move(Direction.Right)
+                        if cloned_board.falling is not None:
+                            cloned_board.move(Direction.Right)
                 else:
                     for _ in range(0, abs(move)):
-                        cloned_board.move(Direction.Left)
-                cloned_board.move(Direction.Drop)
+                        if cloned_board.falling is not None:
+                            cloned_board.move(Direction.Left)
+                if cloned_board.falling is not None:
+                    cloned_board.move(Direction.Drop)
 
                 calculated_score = self.calc_score(board,cloned_board)
 
