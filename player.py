@@ -51,7 +51,7 @@ class MyPlayer(Player):
         # points given
         if score >= 1600:
             complete_line += 4
-            return complete_line * self.linesConstant
+            return complete_line * self.linesConstant * 2
         elif score >= 800:
             complete_line += 3
             return complete_line * (self.linesConstant / 2)
