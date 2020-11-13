@@ -1,10 +1,127 @@
 from board import Direction, Rotation
 from random import Random
+from time import sleep
 
 
 class Player:
     def choose_action(self, board):
         raise NotImplementedError
+
+
+
+class MyPlayer(Player):
+    # heuristic constants
+    heightConstant = -0.510066
+    linesConstant = 0.760666
+    holesConstant = -0.35663
+    bumpinessConstant = -0.184483
+
+    best_horizontal_position = None
+    best_rotation_position = None
+
+    def __init__(self, seed=None):
+        self.random = Random(seed)
+
+    def check_height(self,board):
+        total = 0
+        for (x,y) in board.cells:
+            print("cells", board.cells)
+            print(x)
+            print(y)
+            total += board.height - y
+        return self.heightConstant * total
+    
+    def check_bumpiness(self, board):
+        total = 0
+        columns = [0] * 10
+        for (x, y) in board.cells:
+            if columns[x] < board.height - y:
+                columns[x] = board.height - y
+        for i in range(10):
+            if (i == 9):
+                break
+            total += + abs(columns[i] - columns[i + 1])
+        return total * self.bumpinessConstant
+
+    def check_lines(self, originalBoard, board):
+        # not sure if this is correct
+        score = board.score - originalBoard.score
+        complete_line = 0
+
+        if score >= 1600:
+            complete_line += 4
+        elif score >= 800:
+            complete_line += 3
+        elif score >= 400:
+            complete_line += 2
+        elif score >= 100:
+            complete_line += 1
+        return complete_line * self.linesConstant
+    
+    def check_holes(self, board):
+        holes = 0
+        for x in range(board.width):
+            for y in range(board.height):
+                if (x, y) not in board.cells:
+                    # + 2 since only loops up till 0 to 9 for x
+                    if (x + 2,y) in board.cells and (x - 2,y) in board.cells and (x, y+1) in board.cells and (x, y-1) in board.cells:
+                        holes += 1
+        return self.holesConstant * holes
+
+    def calc_score(self, originalBoard, board):
+        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board)
+        return total
+
+    def simulate_best_position(self, board):
+        score = None
+
+        for rotation in range(0, 4):
+            # the width of the board is 10
+            for horizontal_moves in range(0, board.width):
+                cloned_board = board.clone()
+                for _ in range(0, rotation):
+                    cloned_board.rotate(Rotation.Anticlockwise)
+                move = 5 - horizontal_moves
+                if (move > 0):
+                    for _ in range(0, move):
+                        cloned_board.move(Direction.Right)
+                else:
+                    for _ in range(0, abs(move)):
+                        cloned_board.move(Direction.Left)
+                cloned_board.move(Direction.Drop)
+
+                calculated_score = self.calc_score(board,cloned_board)
+
+                if (score is None):
+                    score = calculated_score
+                    self.best_rotation_position = rotation
+                    self.best_horizontal_position = move
+                
+                if (calculated_score > score):
+                    self.best_rotation_position = rotation
+                    score = calculated_score
+                    self.best_horizontal_position = move
+    
+    def generate_moves(self):
+        generated_moves = []
+        for _ in range(0, self.best_rotation_position):
+            generated_moves.append(Rotation.Anticlockwise)
+        if (self.best_horizontal_position < 0):
+            for _ in range(0, abs(self.best_horizontal_position)):
+                generated_moves.append(Direction.Left)
+        else:
+            for _ in range(0, self.best_horizontal_position):
+                generated_moves.append(Direction.Right)
+        generated_moves.append(Direction.Drop)
+
+        return generated_moves
+    
+
+    def choose_action(self, board):
+
+        self.simulate_best_position(board)
+        return self.generate_moves()
+
 
 
 class RandomPlayer(Player):
@@ -21,4 +138,4 @@ class RandomPlayer(Player):
         ])
 
 
-SelectedPlayer = RandomPlayer
+SelectedPlayer = MyPlayer
