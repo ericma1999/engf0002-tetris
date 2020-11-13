@@ -13,7 +13,7 @@ class Player:
 class MyPlayer(Player):
     # heuristic constants
     heightConstant = -0.510066
-    linesConstant = 0.760666
+    linesConstant = 0.960666
     holesConstant = -0.35663
     bumpinessConstant = -0.184483
 
@@ -27,7 +27,7 @@ class MyPlayer(Player):
         columns = [0] * board.width
         # take only the highest value of y into consideration
         # start from bottom of y
-        for y in range(board.height, -1 , -1):
+        for y in reversed(range(board.height)):
             for x in range(board.width):
                 if (x,y) in board.cells:
                     height = abs(board.height - y)
@@ -83,8 +83,8 @@ class MyPlayer(Player):
                         cloned_board.rotate(Rotation.Anticlockwise)
                     except NoBlockException:
                         pass
-                # 4 here since the board spawns at 6th position
-                move = 5 - horizontal_moves
+                # 4 here since the board spawns the shape at 6 and not in center ***
+                move = 4 - horizontal_moves
                 if (move >= 0):
                     for _ in range(0, move):
                         try:
