@@ -15,6 +15,8 @@ class MyPlayer(Player):
     meanHeightConstant = -0.66
     bumpinessConstant = -0.184483
 
+    moves = 0
+
     best_horizontal_position = None
     best_rotation_position = None
 
@@ -51,12 +53,16 @@ class MyPlayer(Player):
         # points given
         if score >= 1600:
             complete_line += 4
+            return complete_line * self.linesConstant * self.moves
         elif score >= 800:
             complete_line += 3
+            return complete_line * self.linesConstant
         elif score >= 400:
             complete_line += 2
+            return complete_line * self.linesConstant
         elif score >= 100:
             complete_line += 1
+            return complete_line * self.linesConstant
         return complete_line * self.linesConstant
 
     
@@ -103,6 +109,7 @@ class MyPlayer(Player):
 
     def simulate_best_position(self, board):
         score = None
+        self.moves += 1
         for rotation in range(4):
             for horizontal_moves in range(board.width):
                 cloned_board = board.clone()
