@@ -51,10 +51,10 @@ class MyPlayer(Player):
             complete_line += 4
         elif score >= 800:
             complete_line += 3
-        elif score >= 400:
-            complete_line += 2
-        elif score >= 100:
-            complete_line += 1
+        # elif score >= 400:
+        #     complete_line += 2
+        # elif score >= 100:
+        #     complete_line += 1
         return complete_line * self.linesConstant * self.moves
 
     
@@ -102,6 +102,7 @@ class MyPlayer(Player):
     def simulate_best_position(self, board):
         score = None
         self.moves += 1
+        print(self.moves)
         for rotation in range(4):
             for horizontal_moves in range(board.width):
                 cloned_board = board.clone()
