@@ -26,6 +26,7 @@ class MyPlayer(Player):
     def generate_column_height(self, board):
         columns = [0] * board.width
         # take only the highest value of y into consideration
+        # start from bottom of y
         for y in range(board.height, -1 , -1):
             for x in range(board.width):
                 if (x,y) in board.cells:
@@ -63,7 +64,7 @@ class MyPlayer(Player):
         for x in range(board.width):
             for y in range(board.height):
                 if (x, y) not in board.cells:
-                    if (x + 1,y) in board.cells and (x - 1,y) in board.cells and (x, y+1) in board.cells and (x, y-1) in board.cells:
+                    if (x + 2,y) in board.cells and (x - 2,y) in board.cells and (x, y+1) in board.cells and (x, y-1) in board.cells:
                         holes += 1
         return self.holesConstant * holes
 
@@ -82,8 +83,9 @@ class MyPlayer(Player):
                         cloned_board.rotate(Rotation.Anticlockwise)
                     except NoBlockException:
                         pass
-                move = 5 - horizontal_moves
-                if (move > 0):
+                # 4 here since the board spawns at 6th position
+                move = 4 - horizontal_moves
+                if (move >= 0):
                     for _ in range(0, move):
                         try:
                             cloned_board.move(Direction.Right)
