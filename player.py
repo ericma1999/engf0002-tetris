@@ -1,4 +1,4 @@
-from board import Direction, Rotation
+from board import Direction, Rotation, Shape, shape_to_cells
 from random import Random
 from time import sleep
 from exceptions import NoBlockException
@@ -14,6 +14,8 @@ class MyPlayer(Player):
     holesConstant = -0.35663
     meanHeightConstant = -0.66
     bumpinessConstant = -0.184483
+
+    next_is_I = False
 
     best_horizontal_position = None
     best_rotation_position = None
@@ -105,11 +107,25 @@ class MyPlayer(Player):
             except NoBlockException:
                 pass
 
+    def check_shape_is_I(self, cells):
+        is_I = True
+        for (x,y) in cells:
+            if (x,y) not in {(5,1), (5,2), (5,0), (5,3)}:
+                is_I = False
+        return is_I
+
     def simulate_best_position(self, board):
         score = None
         for rotation in range(4):
+            should_break = False
             for horizontal_moves in range(board.width):
                 cloned_board = board.clone()
+                should_break = False
+                if self.check_shape_is_I(cloned_board.falling.cells):
+                    print(True)
+                    self.next_is_I = True
+                    should_break = True
+                    break
                 self.try_rotation(rotation, cloned_board)
                 self.try_moves(horizontal_moves, cloned_board)
 
@@ -125,6 +141,27 @@ class MyPlayer(Player):
                     self.best_rotation_position = rotation
                     score = calculated_score
                     self.best_horizontal_position = 4 - horizontal_moves
+        if (self.next_is_I):
+            self.next_is_I = False
+            cloned_board = board.clone()
+            for _ in range(4):
+                board.move(Direction.Right)
+            cloned_board.move(Direction.Drop)
+            right_score = self.calc_score(board, cloned_board)
+            cloned_board = board.clone()
+            for _ in range(5):
+                cloned_board.move(Direction.Left)
+            cloned_board.move(Direction.Drop)
+            left_score = self.calc_score(board, cloned_board)
+
+            print("left score", left_score)
+            print("right score", right_score)
+            if left_score > right_score:
+                self.best_horizontal_position = 4
+            else:
+                self.best_horizontal_position = -5
+            self.best_rotation_position = 0
+            return
     
     def generate_moves(self):
         generated_moves = []
