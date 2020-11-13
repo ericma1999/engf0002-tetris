@@ -1,6 +1,7 @@
 from board import Direction, Rotation
 from random import Random
 from time import sleep
+from exceptions import NoBlockException
 
 
 class Player:
@@ -74,22 +75,30 @@ class MyPlayer(Player):
         score = None
 
         for rotation in range(0, 4):
-            # the width of the board is 10
             for horizontal_moves in range(0, board.width):
                 cloned_board = board.clone()
                 for _ in range(0, rotation):
-                    cloned_board.rotate(Rotation.Anticlockwise)
+                    try:
+                        cloned_board.rotate(Rotation.Anticlockwise)
+                    except NoBlockException:
+                        pass
                 move = 5 - horizontal_moves
                 if (move > 0):
                     for _ in range(0, move):
-                        if cloned_board.falling is not None:
+                        try:
                             cloned_board.move(Direction.Right)
+                        except NoBlockException:
+                            pass
                 else:
                     for _ in range(0, abs(move)):
-                        if cloned_board.falling is not None:
+                        try:
                             cloned_board.move(Direction.Left)
-                if cloned_board.falling is not None:
+                        except NoBlockException:
+                            pass
+                try:
                     cloned_board.move(Direction.Drop)
+                except NoBlockException:
+                    pass
 
                 calculated_score = self.calc_score(board,cloned_board)
 
