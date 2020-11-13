@@ -12,6 +12,7 @@ class MyPlayer(Player):
     heightConstant = -0.510066
     linesConstant = 1.260666
     holesConstant = -0.35663
+    meanHeightConstant = -0.66
     bumpinessConstant = -0.184483
 
     best_horizontal_position = None
@@ -31,6 +32,9 @@ class MyPlayer(Player):
                     columns[x] = height
         return columns
 
+    def check_mean_height(self,board):
+        return sum(self.generate_column_height(board)) / 10 * self.meanHeightConstant
+
     def check_height(self,board):
         return sum(self.generate_column_height(board)) * self.heightConstant
     
@@ -42,19 +46,23 @@ class MyPlayer(Player):
         return total * self.bumpinessConstant
 
     def check_lines(self, originalBoard, board):
-        # not sure if this is correct
         score = board.score - originalBoard.score
         complete_line = 0
         # points given
         if score >= 1600:
             complete_line += 4
+            return complete_line * self.linesConstant
         elif score >= 800:
             complete_line += 3
+            return complete_line * (self.linesConstant / 2)
         elif score >= 400:
             complete_line += 2
+            return complete_line * (self.linesConstant / 3)
         elif score >= 100:
             complete_line += 1
+            return complete_line * (self.linesConstant / 4)
         return complete_line * self.linesConstant
+
     
     def check_holes(self, board):
         holes = 0
@@ -66,7 +74,7 @@ class MyPlayer(Player):
         return self.holesConstant * holes
 
     def calc_score(self, originalBoard, board):
-        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board)
+        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board) + self.check_mean_height(board)
         return total
 
 
