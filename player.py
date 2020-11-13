@@ -22,32 +22,31 @@ class MyPlayer(Player):
     def __init__(self, seed=None):
         self.random = Random(seed)
 
+    def generate_column_height(self, board):
+        columns = [0] * board.width
+        # take only the highest value of y into consideration
+        for y in range(board.height, -1 , -1):
+            for x in range(board.width):
+                if (x,y) in board.cells:
+                    height = abs(board.height - y)
+                    columns[x] = height
+        return columns
+
     def check_height(self,board):
-        total = 0
-        for (x,y) in board.cells:
-            print("cells", board.cells)
-            print(x)
-            print(y)
-            total += board.height - y
-        return self.heightConstant * total
+        return sum(self.generate_column_height(board)) * self.heightConstant
     
     def check_bumpiness(self, board):
         total = 0
-        columns = [0] * 10
-        for (x, y) in board.cells:
-            if columns[x] < board.height - y:
-                columns[x] = board.height - y
-        for i in range(10):
-            if (i == 9):
-                break
-            total += + abs(columns[i] - columns[i + 1])
+        columns = self.generate_column_height(board)
+        for i in range(9):
+            total += abs(columns[i] - columns[i+1])
         return total * self.bumpinessConstant
 
     def check_lines(self, originalBoard, board):
         # not sure if this is correct
         score = board.score - originalBoard.score
         complete_line = 0
-
+        # points given
         if score >= 1600:
             complete_line += 4
         elif score >= 800:
@@ -63,13 +62,12 @@ class MyPlayer(Player):
         for x in range(board.width):
             for y in range(board.height):
                 if (x, y) not in board.cells:
-                    # + 2 since only loops up till 0 to 9 for x
-                    if (x + 2,y) in board.cells and (x - 2,y) in board.cells and (x, y+1) in board.cells and (x, y-1) in board.cells:
+                    if (x + 1,y) in board.cells and (x - 1,y) in board.cells and (x, y+1) in board.cells and (x, y-1) in board.cells:
                         holes += 1
         return self.holesConstant * holes
 
     def calc_score(self, originalBoard, board):
-        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board)
+        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board)
         return total
 
     def simulate_best_position(self, board):
