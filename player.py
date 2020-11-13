@@ -84,7 +84,7 @@ class MyPlayer(Player):
                     except NoBlockException:
                         pass
                 # 4 here since the board spawns at 6th position
-                move = 4 - horizontal_moves
+                move = 5 - horizontal_moves
                 if (move >= 0):
                     for _ in range(0, move):
                         try:
