@@ -58,18 +58,17 @@ class MyPlayer(Player):
 
     
     def check_holes(self, board):
-        # only check for one hole
-        # not checking for two holes
-        holes = 0
+        columns = self.generate_column_height(board)
+        tally = [0] * 10 
         for x in range(board.width):
-            for y in range(board.height):
+            for y in range(board.height - columns[x], board.height):
                 if (x, y) not in board.cells:
-                    if (x + 1,y) in board.cells and (x - 1,y) in board.cells and (x, y+1) in board.cells and (x, y-1) in board.cells:
-                        holes += 1
-        return self.holesConstant * holes
+                        tally[x] += 1
+        return self.holesConstant * sum(tally)
 
     def calc_score(self, originalBoard, board):
-        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board) + self.check_wells(board)
+        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board)
+        #  + self.check_wells(board)
         #  + self.check_mean_height(board)
         return total
 
