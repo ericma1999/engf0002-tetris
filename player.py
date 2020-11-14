@@ -13,9 +13,7 @@ class MyPlayer(Player):
     heightConstant = -0.510066
     linesConstant = 1.260666
     holesConstant = -0.35663
-    edgesConstant = -0.211443
     bumpinessConstant = -0.184483
-    moves = 0
 
     best_horizontal_position = None
     best_rotation_position = None
@@ -56,29 +54,23 @@ class MyPlayer(Player):
             complete_line += 2
         elif score >= 100:
             complete_line += 1
-        return complete_line * self.linesConstant * self.moves
+        return complete_line * self.linesConstant
 
     
     def check_holes(self, board):
         holes = 0
+
+        height = max(self.generate_column_height(board))
+
         for x in range(board.width):
-            for y in range(board.height):
+            for y in range(board.height - height):
                 if (x, y) not in board.cells:
                     if (x + 1,y) in board.cells and (x - 1,y) in board.cells and (x, y+1) in board.cells and (x, y-1) in board.cells:
                         holes += 1
         return self.holesConstant * holes
 
-    def check_edges(self,board):
-        edges = 0
-        for x in range(board.width):
-            for y in range(board.height):
-                if (x, y) not in board.cells:
-                    if (x + 1,y) in board.cells or (x - 1,y) in board.cells or (x, y+1) in board.cells or (x, y-1) in board.cells:
-                        edges += 1
-        return self.edgesConstant * edges
-
     def calc_score(self, originalBoard, board):
-        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board) + self.check_edges(board)
+        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board)
         #  + self.check_mean_height(board)
         return total
 
@@ -111,7 +103,6 @@ class MyPlayer(Player):
 
     def simulate_best_position(self, board):
         score = None
-        self.moves += 1
         for rotation in range(4):
             for horizontal_moves in range(board.width):
                 cloned_board = board.clone()
