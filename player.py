@@ -13,6 +13,7 @@ class MyPlayer(Player):
     heightConstant = -0.510066
     linesConstant = 1.260666
     holesConstant = -0.35663
+    edgesConstant = -0.211443
     bumpinessConstant = -0.184483
     moves = 0
 
@@ -67,9 +68,17 @@ class MyPlayer(Player):
                         holes += 1
         return self.holesConstant * holes
 
+    def check_edges(self,board):
+        edges = 0
+        for x in range(board.width):
+            for y in range(board.height):
+                if (x, y) not in board.cells:
+                    if (x + 1,y) in board.cells or (x - 1,y) in board.cells or (x, y+1) in board.cells or (x, y-1) in board.cells:
+                        edges += 1
+        return self.edgesConstant * edges
+
     def calc_score(self, originalBoard, board):
-        total = self.check_height(board) 
-        # + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board)
+        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board) + self.check_edges(board)
         #  + self.check_mean_height(board)
         return total
 
