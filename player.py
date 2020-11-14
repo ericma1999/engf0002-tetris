@@ -11,10 +11,12 @@ class Player:
 class MyPlayer(Player):
     # heuristic constants
     heightConstant = -0.510066
-    linesConstant = 1.260666
+    linesConstant = 0.760666
     holesConstant = -0.35663
     bumpinessConstant = -0.184483
-    moves = 0
+    min_range = 0
+    upper_range = 8
+    comboing = False
 
     best_horizontal_position = None
     best_rotation_position = None
@@ -55,7 +57,7 @@ class MyPlayer(Player):
             complete_line += 2
         elif score >= 100:
             complete_line += 1
-        return complete_line * self.linesConstant * self.moves
+        return complete_line * self.linesConstant
 
     
     def check_holes(self, board):
@@ -101,10 +103,22 @@ class MyPlayer(Player):
 
     def simulate_best_position(self, board):
         score = None
-        self.moves += 1
         for rotation in range(4):
-            for horizontal_moves in range(board.width):
+            for horizontal_moves in range(self.min_range,self.upper_range):
                 cloned_board = board.clone()
+
+                columns = self.generate_column_height(cloned_board)
+                if ((sum(columns[3:10]) / 6) >= 5 or (sum(columns[0:3]) / 3) >= 5):
+ 
+                    self.min_range = 8
+                    self.upper_range = 10
+                    self.linesConstant = 1.5660066
+                else:
+                    self.min_range = 0
+                    self.upper_range = 8
+                    self.linesConstant = 0.760666
+
+
                 self.try_rotation(rotation, cloned_board)
                 self.try_moves(horizontal_moves, cloned_board)
 
