@@ -69,10 +69,18 @@ class MyPlayer(Player):
         return self.holesConstant * holes
 
     def calc_score(self, originalBoard, board):
-        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board)
+        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board) + self.check_wells(board)
         #  + self.check_mean_height(board)
         return total
 
+    def check_wells(self, board):
+        columns = self.generate_column_height(board)
+        tally = [0] * 10 
+        for x in range(board.width):
+            for y in range(board.height - columns[x], board.height):
+                if(x,y) not in board.cells:
+                    tally[x] += 1
+        return max(tally) * self.holesConstant
 
     def try_rotation(self,rotation, board):
         for _ in range(rotation):
