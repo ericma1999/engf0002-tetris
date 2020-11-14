@@ -12,7 +12,7 @@ class MyPlayer(Player):
     # heuristic constants
     heightConstant = -0.510066
     linesConstant = 1.260666
-    holesConstant = -0.71326
+    holesConstant = -0.35663
     bumpinessConstant = -0.184483
 
     best_horizontal_position = None
@@ -67,19 +67,18 @@ class MyPlayer(Player):
         return self.holesConstant * sum(tally)
 
     def calc_score(self, originalBoard, board):
-        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board) 
-        # + self.check_wells(board)
+        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board) + self.check_wells(board)
         #  + self.check_mean_height(board)
         return total
 
-    # def check_wells(self, board):
-    #     columns = self.generate_column_height(board)
-    #     tally = [0] * 10 
-    #     for x in range(board.width):
-    #         for y in range(board.height - columns[x], board.height):
-    #             if(x,y) not in board.cells:
-    #                 tally[x] += 1
-    #     return max(tally) * self.holesConstant
+    def check_wells(self, board):
+        columns = self.generate_column_height(board)
+        tally = [0] * 10 
+        for x in range(board.width):
+            for y in range(board.height - columns[x], board.height):
+                if(x,y) not in board.cells:
+                    tally[x] += 1
+        return max(tally) * self.holesConstant
 
     def try_rotation(self,rotation, board):
         for _ in range(rotation):
