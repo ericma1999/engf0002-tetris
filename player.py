@@ -11,11 +11,11 @@ class Player:
 class MyPlayer(Player):
     # heuristic constants
     heightConstant = -0.510066
-    linesConstant = 0.760666
-    holesConstant = -0.35663
+    linesConstant = 0.960666
+    holesConstant = -0.75663
     bumpinessConstant = -0.184483
     colWithHoles = -0.29445
-
+    block = 0
     min_range = 0
     upper_range = 10
     comboing = False
@@ -63,12 +63,16 @@ class MyPlayer(Player):
         # points given
         if score >= 1600:
             complete_line += 4
+            return complete_line * self.linesConstant * 2
         elif score >= 800:
             complete_line += 3
+            return complete_line * self.linesConstant / 2
         elif score >= 400:
             complete_line += 2
+            return complete_line * self.linesConstant / 3
         elif score >= 100:
             complete_line += 1
+            return complete_line * self.linesConstant / 4
         return complete_line * self.linesConstant
 
     
@@ -82,7 +86,8 @@ class MyPlayer(Player):
         return self.holesConstant * holes
 
     def calc_score(self, originalBoard, board):
-        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board) + self.check_col_with_holes(board)
+        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board) 
+        # + self.check_col_with_holes(board)
         #  + self.check_mean_height(board)
         return total
 
@@ -115,14 +120,22 @@ class MyPlayer(Player):
 
     def simulate_best_position(self, board):
         score = None
+        self.block +=1
+        print("block", self.block)
         for rotation in range(4):
             for horizontal_moves in range(self.min_range,self.upper_range):
                 cloned_board = board.clone()
 
-                print(self.check_col_with_holes(cloned_board))
-                # columns = self.generate_column_height(cloned_board)
-                # if ((sum(columns[3:10]) / 6) >= 5 or (sum(columns[0:3]) / 3) >= 5):
- 
+                columns = self.generate_column_height(cloned_board)
+                print(columns)
+                if ((sum(columns[0:10]) / 10) >= 10):
+                    # self.min_range = 0
+                    # self.upper_range = 10
+                    self.linesConstant = 1.266006
+                else:
+                    # self.min_range = 3
+                    # self.upper_range = 10
+                    self.linesConstant = 0.960666
                 #     self.min_range = 8
                 #     self.upper_range = 10
                 #     self.linesConstant = 1.5660066
