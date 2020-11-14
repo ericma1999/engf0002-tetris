@@ -14,8 +14,10 @@ class MyPlayer(Player):
     linesConstant = 0.760666
     holesConstant = -0.35663
     bumpinessConstant = -0.184483
+    colWithHoles = -0.29445
+
     min_range = 0
-    upper_range = 8
+    upper_range = 10
     comboing = False
 
     best_horizontal_position = None
@@ -45,6 +47,16 @@ class MyPlayer(Player):
             total += abs(columns[i] - columns[i+1])
         return total * self.bumpinessConstant
 
+    def check_col_with_holes(self, board):
+        total_cols = []
+        for x in range(board.width):
+            for y in range(board.height):
+                if (x, y) not in board.cells:
+                    if (x + 1,y) in board.cells and (x - 1,y) in board.cells and (x, y+1) in board.cells and (x, y-1) in board.cells:
+                        total_cols.append(x)
+        unique_cols = set(total_cols)
+        return len(unique_cols) * self.colWithHoles
+
     def check_lines(self, originalBoard, board):
         score = board.score - originalBoard.score
         complete_line = 0
@@ -70,7 +82,7 @@ class MyPlayer(Player):
         return self.holesConstant * holes
 
     def calc_score(self, originalBoard, board):
-        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board)
+        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board) + self.check_col_with_holes(board)
         #  + self.check_mean_height(board)
         return total
 
@@ -107,16 +119,17 @@ class MyPlayer(Player):
             for horizontal_moves in range(self.min_range,self.upper_range):
                 cloned_board = board.clone()
 
-                columns = self.generate_column_height(cloned_board)
-                if ((sum(columns[3:10]) / 6) >= 5 or (sum(columns[0:3]) / 3) >= 5):
+                print(self.check_col_with_holes(cloned_board))
+                # columns = self.generate_column_height(cloned_board)
+                # if ((sum(columns[3:10]) / 6) >= 5 or (sum(columns[0:3]) / 3) >= 5):
  
-                    self.min_range = 8
-                    self.upper_range = 10
-                    self.linesConstant = 1.5660066
-                else:
-                    self.min_range = 0
-                    self.upper_range = 8
-                    self.linesConstant = 0.760666
+                #     self.min_range = 8
+                #     self.upper_range = 10
+                #     self.linesConstant = 1.5660066
+                # else:
+                #     self.min_range = 0
+                #     self.upper_range = 8
+                #     self.linesConstant = 0.760666
 
 
                 self.try_rotation(rotation, cloned_board)
