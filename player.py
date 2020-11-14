@@ -52,18 +52,17 @@ class MyPlayer(Player):
             complete_line += 3
         elif score >= 400:
             complete_line += 2
-        elif score >= 100:
-            complete_line += 1
+        # elif score >= 100:
+        #     complete_line += 1
         return complete_line * self.linesConstant
 
     
     def check_holes(self, board):
+        # only check for one hole
+        # not checking for two holes
         holes = 0
-
-        height = max(self.generate_column_height(board))
-
         for x in range(board.width):
-            for y in range(board.height - height):
+            for y in range(board.height):
                 if (x, y) not in board.cells:
                     if (x + 1,y) in board.cells and (x - 1,y) in board.cells and (x, y+1) in board.cells and (x, y-1) in board.cells:
                         holes += 1
