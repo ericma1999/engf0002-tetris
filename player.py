@@ -67,8 +67,7 @@ class MyPlayer(Player):
         return self.holesConstant * sum(tally)
 
     def calc_score(self, originalBoard, board):
-        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board)
-        #  + self.check_wells(board)
+        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board) + self.check_wells(board)
         #  + self.check_mean_height(board)
         return total
 
