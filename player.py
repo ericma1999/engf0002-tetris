@@ -66,18 +66,6 @@ class MyPlayer(Player):
                         tally[x] += 1
         return self.holesConstant * sum(tally)
 
-    def check_cols_with_holes(self, board):
-        columns = self.generate_column_height(board)
-        tally = [0] * 10 
-        for x in range(board.width):
-            for y in range(board.height - columns[x], board.height):
-                if(x,y) not in board.cells:
-                    tally[x] += 1
-        columns_with_empty = len([column for column in columns if column > 0])
-
-        return self.holesConstant * columns_with_empty
-
-    # check the max height of empty columns
     def check_wells(self, board):
         columns = self.generate_column_height(board)
         tally = [0] * 10 
@@ -88,7 +76,7 @@ class MyPlayer(Player):
         return max(tally) * self.holesConstant
 
     def calc_score(self, originalBoard, board):
-        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board) + self.check_wells(board) + self.check_cols_with_holes(board)
+        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board) + self.check_wells(board)
         #  + self.check_mean_height(board)
         return total
 
