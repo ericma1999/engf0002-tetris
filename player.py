@@ -78,7 +78,7 @@ class MyPlayer(Player):
     def check_empty_columns(self, board):
         columns = self.generate_column_height(board)
         no_of_empty_columns = len([column for column in columns if column == 0])
-        return no_of_empty_columns * self.holesConstant
+        return no_of_empty_columns * -0.10
 
     def calc_score(self, originalBoard, board):
         total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board) + self.check_wells(board) + self.check_empty_columns(board)
