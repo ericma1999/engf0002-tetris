@@ -175,4 +175,4 @@ class RandomPlayer(Player):
         ])
 
 
-SelectedPlayer = RandomPlayer
+SelectedPlayer = MyPlayer
