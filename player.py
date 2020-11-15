@@ -81,7 +81,7 @@ class MyPlayer(Player):
         return no_of_empty_columns * self.holesConstant
 
     def calc_score(self, originalBoard, board):
-        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board) + self.check_wells(board) + self.check_empty_columns_columns(board)
+        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board) + self.check_wells(board) + self.check_empty_columns(board)
         #  + self.check_mean_height(board)
         return total
 
