@@ -10,10 +10,10 @@ class Player:
         raise NotImplementedError
 class MyPlayer(Player):
     # heuristic constants
-    heightConstant = -0.510066
+    heightConstant = -0.610066
     linesConstant = 1.260666
-    holesConstant = -0.55663
-    bumpinessConstant = -0.184483
+    holesConstant = -0.35663
+    bumpinessConstant = -0.384483
 
     best_horizontal_position = None
     best_rotation_position = None
