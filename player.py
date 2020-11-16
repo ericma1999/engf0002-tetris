@@ -12,9 +12,8 @@ class MyPlayer(Player):
     # heuristic constants
     heightConstant = -0.510066
     linesConstant = 1.260666
-    holesConstant = -0.75663
+    holesConstant = -0.55663
     bumpinessConstant = -0.184483
-    moves = 0
 
     best_horizontal_position = None
     best_rotation_position = None
@@ -108,23 +107,9 @@ class MyPlayer(Player):
                 pass
 
     def simulate_best_position(self, board):
-        self.moves += 1
-        print("moves", self.moves)
         score = None
-        height_columns = self.generate_column_height(board)
-        avg = sum(height_columns[0:7]) / len(height_columns[0:7])
-        columns_more_than_four = len([column for column in height_columns[0:7] if column > 4])
-        upper_bound = 10
-        lower_bound = 3
-        if (columns_more_than_four > 4):
-            upper_bound = 10
-            lower_bound = 0
-        else:
-            upper_bound = 10
-            lower_bound = 2
-
         for rotation in range(4):
-            for horizontal_moves in range(lower_bound, upper_bound):
+            for horizontal_moves in range(board.width):
                 cloned_board = board.clone()
                 self.try_rotation(rotation, cloned_board)
                 self.try_moves(horizontal_moves, cloned_board)
