@@ -12,7 +12,7 @@ class MyPlayer(Player):
     # heuristic constants
     heightConstant = -0.510066
     linesConstant = 1.260666
-    holesConstant = -0.45663
+    holesConstant = -0.75663
     bumpinessConstant = -0.184483
     moves = 0
 
@@ -65,7 +65,7 @@ class MyPlayer(Player):
             for y in range(board.height - columns[x], board.height):
                 if (x, y) not in board.cells:
                         tally[x] += 1
-        return self.holesConstant * sum(tally) * 1.5
+        return self.holesConstant * sum(tally)
 
     def check_wells(self, board):
         columns = self.generate_column_height(board)
@@ -74,7 +74,7 @@ class MyPlayer(Player):
             for y in range(board.height - columns[x], board.height):
                 if(x,y) not in board.cells:
                     tally[x] += 1
-        return max(tally) * self.holesConstant * 1.2
+        return max(tally) * self.holesConstant
 
     def calc_score(self, originalBoard, board):
         total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board) + self.check_wells(board)
@@ -109,20 +109,20 @@ class MyPlayer(Player):
 
     def simulate_best_position(self, board):
         self.moves += 1
-        print("current move", self.moves)
+        print("moves", self.moves)
         score = None
         height_columns = self.generate_column_height(board)
-        print(height_columns)
-        avg_height = sum(height_columns[0:7]) / 8
+        avg = sum(height_columns[0:7]) / len(height_columns[0:7])
+        columns_more_than_four = len([column for column in height_columns[0:7] if column > 4])
         upper_bound = 10
         lower_bound = 3
-        print(avg_height)
-        if (avg_height > 6):
+        if (columns_more_than_four > 5 or avg > 5):
             upper_bound = 10
             lower_bound = 0
         else:
             upper_bound = 10
             lower_bound = 2
+
         for rotation in range(4):
             for horizontal_moves in range(lower_bound, upper_bound):
                 cloned_board = board.clone()
