@@ -11,7 +11,7 @@ class Player:
 class MyPlayer(Player):
     # heuristic constants
     heightConstant = -0.510066
-    linesConstant = 1.260666
+    linesConstant = 0.960666
     holesConstant = -0.35663
     bumpinessConstant = -0.184483
 
@@ -55,7 +55,13 @@ class MyPlayer(Player):
         # elif score >= 100:
         #     complete_line += 1
         return complete_line * self.linesConstant
-        
+    
+    def check_min_max_difference(self, board):
+        columns = self.generate_column_height(board)
+
+        return max(columns) - min(columns) * -0.3466
+
+    
     def check_holes(self, board):
         columns = self.generate_column_height(board)
         tally = [0] * 10 
