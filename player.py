@@ -90,6 +90,7 @@ class MyPlayer(Player):
                         pass
     def try_moves(self, moves, board):
     # 4 here since the board spawns the shape at 6 and not in center ***
+
             move = 4 - moves
             if (move >= 0):
                 for _ in range(move):
@@ -111,6 +112,18 @@ class MyPlayer(Player):
     def simulate_best_position(self, board):
         score = None
         self.moves += 1
+        upper_bound = 10
+        lower_bound = 4
+
+        columns = self.generate_column_height(board)
+
+        avg = sum(columns) / len(columns)
+
+        if avg > 4:
+            self.linesConstant = 1.3
+        else:
+            self.linesConstant = 0.8
+
         print("moves", self.moves)
         for rotation in range(4):
             for horizontal_moves in range(board.width):
