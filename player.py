@@ -116,7 +116,7 @@ class MyPlayer(Player):
         columns_more_than_four = len([column for column in height_columns[0:7] if column > 4])
         upper_bound = 10
         lower_bound = 3
-        if (columns_more_than_four > 5 or avg > 5):
+        if (columns_more_than_four > 4 or avg > 4):
             upper_bound = 10
             lower_bound = 0
         else:
