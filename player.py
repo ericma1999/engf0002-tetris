@@ -65,7 +65,7 @@ class MyPlayer(Player):
             for y in range(board.height - columns[x], board.height):
                 if (x, y) not in board.cells:
                         tally[x] += 1
-        return self.holesConstant * sum(tally)
+        return self.holesConstant * sum(tally) * 1.5
 
     def check_wells(self, board):
         columns = self.generate_column_height(board)
@@ -74,7 +74,7 @@ class MyPlayer(Player):
             for y in range(board.height - columns[x], board.height):
                 if(x,y) not in board.cells:
                     tally[x] += 1
-        return max(tally) * self.holesConstant
+        return max(tally) * self.holesConstant * 1.2
 
     def calc_score(self, originalBoard, board):
         total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board) + self.check_wells(board)
@@ -117,7 +117,7 @@ class MyPlayer(Player):
         upper_bound = 10
         lower_bound = 3
         print(avg_height)
-        if (avg_height > 4):
+        if (avg_height > 6):
             upper_bound = 10
             lower_bound = 0
         else:
