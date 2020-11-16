@@ -78,7 +78,7 @@ class MyPlayer(Player):
             for y in range(board.height - columns[x], board.height):
                 if(x,y) not in board.cells:
                     tally[x] += 1
-        return max(tally) * self.holesConstant
+        return max(tally) * self.holesConstant * 1.5
 
     def calculate_mean(self, list):
         return sum(list) / len(list)
@@ -124,20 +124,29 @@ class MyPlayer(Player):
     def simulate_best_position(self, board):
         score = None
         self.moves +=1
-        print("current move", self.moves)
+        print("moves", self.moves)
+        upper_bound = 10
+        lower_bound = 2
         columns = self.generate_column_height(board)
-        upper = 10
-        lower = 2
-        avg = sum(columns) / len(columns)
-        if (avg > 3):
-            upper = 10
-            lower = 0
+        more_than_four = [column for column in columns if column >= 4]
+        moure_than_eight = [column for column in columns if column >= 6]
+        print(sum(columns) / len(columns))
+        avg = sum(columns) / 8
+        if(len(more_than_four) >= 5 or avg > 4 or len(moure_than_eight) >= 2):
+            upper_bound = 10
+            lower_bound = 0
+            self.holesConstant = -0.55663 
+            self.heightConstant = -0.610066
         else:
-            lower = 2
+            self.holesConstant = -2.0
+            self.heightConstant = -0.14
+            upper_bound = 10
+            lower_bound = 2
+
         
 
         for rotation in range(4):
-            for horizontal_moves in range(lower, upper):
+            for horizontal_moves in range(lower_bound, upper_bound):
                 cloned_board = board.clone()
                 
                 self.try_rotation(rotation, cloned_board)
