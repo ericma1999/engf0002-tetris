@@ -42,18 +42,6 @@ class MyPlayer(Player):
             total += abs(columns[i] - columns[i+1])
         return total * self.bumpinessConstant
 
-    def check_empty_columns(self, board):
-        columns = self.generate_column_height(board)
-        empty_columns = [False] * 10
-        for x in range(board.width):
-            for y in range(board.height - columns[x], board.height):
-                if(x,y) in board.cells:
-                    empty_columns[x] += True
-
-        empty_columns = len([column for column in empty_columns if column == False])
-
-        return empty_columns * -0.3
-
     def check_lines(self, originalBoard, board):
         score = board.score - originalBoard.score
         complete_line = 0
@@ -67,13 +55,7 @@ class MyPlayer(Player):
         # elif score >= 100:
         #     complete_line += 1
         return complete_line * self.linesConstant
-    
-    def check_min_max_difference(self, board):
-        columns = self.generate_column_height(board)
-
-        return max(columns) - min(columns) * -0.3466
-
-    
+        
     def check_holes(self, board):
         columns = self.generate_column_height(board)
         tally = [0] * 10 
@@ -93,7 +75,7 @@ class MyPlayer(Player):
         return max(tally) * self.holesConstant
 
     def calc_score(self, originalBoard, board):
-        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board) + self.check_wells(board) + self.check_empty_columns(board)
+        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board) + self.check_wells(board)
         #  + self.check_mean_height(board)
         return total
 
