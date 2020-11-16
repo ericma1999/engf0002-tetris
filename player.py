@@ -99,10 +99,18 @@ class MyPlayer(Player):
                             transitions += 1
         return transitions * -0.3
 
+    def check_board_difference(self, originalBoard, board):
+        original_columns = self.generate_column_height(originalBoard)
+        original_avg = sum(original_columns) / len(original_columns)
+
+        cloned_columns = self.generate_column_height(board)
+        cloned_avg = sum(cloned_columns) / len(cloned_columns)
+
+        return (cloned_avg - original_avg) * -0.7
+
     def calc_score(self, originalBoard, board):
         total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board) + self.check_wells(board) 
-        + self.check_row_transitions(board)
-        #  + self.check_mean_height(board)
+        + self.check_row_transitions(board) + self.check_board_difference(originalBoard, board)
         return total
 
     def try_rotation(self,rotation, board):
