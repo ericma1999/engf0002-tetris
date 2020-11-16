@@ -52,8 +52,8 @@ class MyPlayer(Player):
             complete_line += 3
         elif score >= 400:
             complete_line += 2
-        # elif score >= 100:
-        #     complete_line += 1
+        elif score >= 100:
+            complete_line += 1
         return complete_line * self.linesConstant
     
     def check_min_max_difference(self, board):
