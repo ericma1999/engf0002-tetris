@@ -12,7 +12,7 @@ class MyPlayer(Player):
     # heuristic constants
     heightConstant = -0.510066
     linesConstant = 0.960666
-    holesConstant = -0.35663
+    holesConstant = -0.65663
     bumpinessConstant = -0.184483
 
     best_horizontal_position = None
@@ -55,19 +55,13 @@ class MyPlayer(Player):
         # elif score >= 100:
         #     complete_line += 1
         return complete_line * self.linesConstant
+    
+    def check_min_max_difference(self, board):
+        columns = self.generate_column_height(board)
 
-    def check_fullness(self, board):
-       columns = self.generate_column_height(board)
-       tally = [0] * 10 
-       for x in range(board.width):
-            for y in range(board.height - columns[x], board.height):
-                if (x, y) not in board.cells:
-                        tally[x] += 1
-       full_columns = [column for column in columns if column == 0]
+        return max(columns) - min(columns) * -0.3466
 
-       return full_columns * 0.41
-            
-
+    
     def check_holes(self, board):
         columns = self.generate_column_height(board)
         tally = [0] * 10 
@@ -87,7 +81,7 @@ class MyPlayer(Player):
         return max(tally) * self.holesConstant
 
     def calc_score(self, originalBoard, board):
-        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board) + self.check_wells(board) + self.check_fullness(board)
+        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board) + self.check_wells(board)
         #  + self.check_mean_height(board)
         return total
 
