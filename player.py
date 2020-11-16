@@ -3,7 +3,8 @@ from random import Random
 from time import sleep
 from exceptions import NoBlockException
 
-
+# references
+# https://codemyroad.wordpress.com/2013/04/14/tetris-ai-the-near-perfect-player/
 class Player:
     def choose_action(self, board):
         raise NotImplementedError
@@ -42,7 +43,6 @@ class MyPlayer(Player):
         return total * self.bumpinessConstant
 
     def check_lines(self, originalBoard, board):
-        # not sure if this is correct
         score = board.score - originalBoard.score
         complete_line = 0
         # points given
@@ -50,66 +50,87 @@ class MyPlayer(Player):
             complete_line += 4
         elif score >= 800:
             complete_line += 3
-        elif score >= 400:
-            complete_line += 2
-        elif score >= 100:
-            complete_line += 1
+        # elif score >= 400:
+        #     complete_line += 2
+        # elif score >= 100:
+        #     complete_line += 1
         return complete_line * self.linesConstant
+
     
     def check_holes(self, board):
-        holes = 0
+        columns = self.generate_column_height(board)
+        tally = [0] * 10 
         for x in range(board.width):
-            for y in range(board.height):
+            for y in range(board.height - columns[x], board.height):
                 if (x, y) not in board.cells:
-                    if (x + 1,y) in board.cells and (x - 1,y) in board.cells and (x, y+1) in board.cells and (x, y-1) in board.cells:
-                        holes += 1
-        return self.holesConstant * holes
+                        tally[x] += 1
+        return self.holesConstant * sum(tally)
+
+    def check_wells(self, board):
+        columns = self.generate_column_height(board)
+        tally = [0] * 10 
+        for x in range(board.width):
+            for y in range(board.height - columns[x], board.height):
+                if(x,y) not in board.cells:
+                    tally[x] += 1
+        return max(tally) * self.holesConstant
+
+    def check_empty_columns(self, board):
+        columns = self.generate_column_height(board)
+        no_of_empty_columns = len([column for column in columns if column == 0])
+        return no_of_empty_columns * -0.3
 
     def calc_score(self, originalBoard, board):
-        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board)
+        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board) + self.check_wells(board) + self.check_empty_columns(board)
+        #  + self.check_mean_height(board)
         return total
+
+    def try_rotation(self,rotation, board):
+        for _ in range(rotation):
+                    try:
+                        board.rotate(Rotation.Anticlockwise)
+                    except NoBlockException:
+                        pass
+    def try_moves(self, moves, board):
+    # 4 here since the board spawns the shape at 6 and not in center ***
+            move = 4 - moves
+            if (move >= 0):
+                for _ in range(move):
+                    try:
+                        board.move(Direction.Right)
+                    except NoBlockException:
+                        pass
+            else:
+                for _ in range(abs(move)):
+                    try:
+                        board.move(Direction.Left)
+                    except NoBlockException:
+                        pass
+            try:
+                board.move(Direction.Drop)
+            except NoBlockException:
+                pass
 
     def simulate_best_position(self, board):
         score = None
-        first_board = None
         for rotation in range(4):
             for horizontal_moves in range(board.width):
                 cloned_board = board.clone()
-                for _ in range(rotation):
-                    try:
-                        cloned_board.rotate(Rotation.Anticlockwise)
-                    except NoBlockException:
-                        pass
-                # 4 here since the board spawns the shape at 6 and not in center ***
-                move = 4 - horizontal_moves
-                if (move >= 0):
-                    for _ in range(move):
-                        try:
-                            cloned_board.move(Direction.Right)
-                        except NoBlockException:
-                            pass
-                else:
-                    for _ in range(abs(move)):
-                        try:
-                            cloned_board.move(Direction.Left)
-                        except NoBlockException:
-                            pass
-                try:
-                    cloned_board.move(Direction.Drop)
-                except NoBlockException:
-                    pass
+                self.try_rotation(rotation, cloned_board)
+                self.try_moves(horizontal_moves, cloned_board)
 
                 calculated_score = self.calc_score(board,cloned_board)
 
                 if (score is None):
                     score = calculated_score
                     self.best_rotation_position = rotation
-                    self.best_horizontal_position = move
+                    self.best_horizontal_position = 4 - horizontal_moves
                 
                 if (calculated_score > score):
+                    best_board = cloned_board
                     self.best_rotation_position = rotation
                     score = calculated_score
-                    self.best_horizontal_position = move
+                    self.best_horizontal_position = 4 - horizontal_moves
     
     def generate_moves(self):
         generated_moves = []
