@@ -113,11 +113,13 @@ class MyPlayer(Player):
         upper_bound = 10
         lower_bound = 2
         columns = self.generate_column_height(board)
-        more_than_four = [column for column in columns if column >= 4]
-        moure_than_eight = [column for column in columns if column >= 5]
+        more_than_four = [column for column in columns[0:7] if column >= 4]
+        moure_than_eight = [column for column in columns[0:7] if column >= 5]
         print(sum(columns) / len(columns))
-        avg = sum(columns) / len(columns)
-        if(len(more_than_four) >= 6 or avg > 4.4 or len(moure_than_eight) >= 2):
+        avg = sum(columns) / 8
+        print("current avg", avg)
+        if(avg > 5.1 or len(moure_than_eight) >= 6):
+            print("inside avg")
             upper_bound = 10
             lower_bound = 0
             self.holesConstant = -1.5666
@@ -125,7 +127,7 @@ class MyPlayer(Player):
             self.holesConstant = -2.0
             upper_bound = 10
             lower_bound = 2
-
+        print(lower_bound)
         for rotation in range(4):
             for horizontal_moves in range(lower_bound, upper_bound):
                 cloned_board = board.clone()
