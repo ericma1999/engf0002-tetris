@@ -14,7 +14,7 @@ class MyPlayer(Player):
     linesConstant = 1.260666
     holesConstant = -0.35663
     bumpinessConstant = -0.184483
-
+    moves = 0
     best_horizontal_position = None
     best_rotation_position = None
 
@@ -50,8 +50,8 @@ class MyPlayer(Player):
             complete_line += 4
         elif score >= 800:
             complete_line += 3
-        elif score >= 400:
-            complete_line += 2
+        # elif score >= 400:
+        #     complete_line += 2
         # elif score >= 100:
         #     complete_line += 1
         return complete_line * self.linesConstant
@@ -90,7 +90,8 @@ class MyPlayer(Player):
         return (self.calculate_mean(cloned_columns) - self.calculate_mean(original_columns)) * -0.2
 
     def calc_score(self, originalBoard, board):
-        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board) + self.check_wells(board) + self.check_height_of_board(originalBoard, board)
+        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board) + self.check_wells(board) 
+        # + self.check_height_of_board(originalBoard, board)
         #  + self.check_mean_height(board)
         return total
 
@@ -122,9 +123,23 @@ class MyPlayer(Player):
 
     def simulate_best_position(self, board):
         score = None
+        self.moves +=1
+        print("current move", self.moves)
+        columns = self.generate_column_height(board)
+        upper = 10
+        lower = 2
+        avg = sum(columns) / len(columns)
+        if (avg > 3):
+            upper = 10
+            lower = 0
+        else:
+            lower = 2
+        
+
         for rotation in range(4):
-            for horizontal_moves in range(board.width):
+            for horizontal_moves in range(lower, upper):
                 cloned_board = board.clone()
+                
                 self.try_rotation(rotation, cloned_board)
                 self.try_moves(horizontal_moves, cloned_board)
 
