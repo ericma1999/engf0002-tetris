@@ -134,10 +134,7 @@ class MyPlayer(Player):
                 self.try_rotation(rotation, cloned_board)
                 self.try_moves(horizontal_moves, cloned_board)
                 calculated_score = self.calc_score(board,cloned_board)
-                
-                best_second_rotation = None
-                best_second_move = None
-                second_score = None
+
                 for second_rotation in range(4):
                     for second_horizontal_moves in range(board.width):
                         second_board = cloned_board.clone()
@@ -145,14 +142,15 @@ class MyPlayer(Player):
                         self.try_moves(second_horizontal_moves, second_board)
 
                         calc_second_score = self.calc_score(cloned_board, second_board)
-                        if second_score is None:
-                            second_score = calc_second_score + calculated_score
+                        if score is None:
+                            score = calc_second_score + calculated_score
                             self.second_rotation = second_rotation
                             self.second_move = 4 - second_horizontal_moves
                             self.best_horizontal_position = 4 - horizontal_moves
                             self.best_rotation_position = rotation
 
-                        if calc_second_score + calculated_score > second_score:
+                        if calc_second_score + calculated_score > score:
+                            score = calc_second_score + calculated_score
                             self.second_rotation = second_rotation
                             self.second_move = 4 - second_horizontal_moves
                             self.best_horizontal_position = 4 - horizontal_moves
@@ -182,13 +180,20 @@ class MyPlayer(Player):
     def choose_action(self, board):
 
         if (self.second_move is not None and self.second_rotation is not None):
-            return self.generate_moves(self.second_rotation, self.second_move)
-            self.second_rotation = None
-            self.second_move = None
-        else:
-            self.simulate_best_position(board)
+            print("if")
+            print(self.second_move)
 
-        return self.generate_moves(self.best_rotation_position, self.best_horizontal_position)
+            rotation = self.second_rotation
+            move = self.second_move
+            self.second_move = None
+            self.second_rotation = None
+            return self.generate_moves(rotation, move)
+        else:
+            print("else")
+            self.simulate_best_position(board)
+            return self.generate_moves(self.best_rotation_position, self.best_horizontal_position)
+        
+        
 
 
 
