@@ -10,12 +10,10 @@ class Player:
         raise NotImplementedError
 class MyPlayer(Player):
     # heuristic constants
-    heightConstant = -0.410066
-    linesConstant = 0.860666
-    holesConstant = -0.45663
+    heightConstant = -0.510066
+    linesConstant = 0.960666
+    holesConstant = -0.35663
     bumpinessConstant = -0.184483
-
-    moves = 0
 
     best_horizontal_position = None
     best_rotation_position = None
@@ -57,6 +55,11 @@ class MyPlayer(Player):
         # elif score >= 100:
         #     complete_line += 1
         return complete_line * self.linesConstant
+    
+    def check_min_max_difference(self, board):
+        columns = self.generate_column_height(board)
+
+        return max(columns) - min(columns) * -0.3466
 
     
     def check_holes(self, board):
@@ -77,8 +80,28 @@ class MyPlayer(Player):
                     tally[x] += 1
         return max(tally) * self.holesConstant
 
+    def check_row_transitions(self, board):
+        columns = self.generate_column_height(board)
+        transitions = 0
+        for x in range(board.width):
+            for y in range(board.height - columns[x], board.height):
+                if(x,y) not in board.cells:
+                    if x == 0:
+                        if (x +1, y) not in board.cells:
+                            transitions += 1
+                    elif x == 9:
+                        if (x- 1,y) not in board.cells:
+                            transitions += 1
+                    else:
+                        if (x+1,y) in board.cells:
+                            transitions += 1
+                        elif (x - 1,y) in board.cells:
+                            transitions += 1
+        return transitions * -0.3
+
     def calc_score(self, originalBoard, board):
-        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board) + self.check_wells(board)
+        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board) + self.check_wells(board) 
+        + self.check_row_transitions(board)
         #  + self.check_mean_height(board)
         return total
 
@@ -90,7 +113,6 @@ class MyPlayer(Player):
                         pass
     def try_moves(self, moves, board):
     # 4 here since the board spawns the shape at 6 and not in center ***
-
             move = 4 - moves
             if (move >= 0):
                 for _ in range(move):
@@ -111,20 +133,6 @@ class MyPlayer(Player):
 
     def simulate_best_position(self, board):
         score = None
-        self.moves += 1
-        upper_bound = 10
-        lower_bound = 4
-
-        columns = self.generate_column_height(board)
-
-        avg = sum(columns) / len(columns)
-
-        if avg > 3:
-            self.linesConstant = 1.3
-        else:
-            self.linesConstant = 0.8
-
-        print("moves", self.moves)
         for rotation in range(4):
             for horizontal_moves in range(board.width):
                 cloned_board = board.clone()
