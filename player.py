@@ -113,21 +113,21 @@ class MyPlayer(Player):
         upper_bound = 10
         lower_bound = 2
         columns = self.generate_column_height(board)
-        more_than_four = [column for column in columns[0:7] if column >= 5]
-        moure_than_five = [column for column in columns[0:7] if column >= 7]
-        moure_than_six = [column for column in columns[0:7] if column >= 8]
+        more_than_four = [column for column in columns if column >= 4]
+        moure_than_five = [column for column in columns if column >= 5]
+        moure_than_six = [column for column in columns if column >= 6]
         print(sum(columns) / len(columns))
         avg = sum(columns) / len(columns)
-        if(len(more_than_four) >= 8 or len(moure_than_five) >= 4 or avg > 8):
+        if(len(more_than_four) >= 8 or len(moure_than_five) >= 4 or avg > 6):
             upper_bound = 10
             lower_bound = 0
-            self.holesConstant = -1.2666
+            self.holesConstant = -0.510066
             self.heightConstant = -0.7
             self.bumpinessConstant = -0.384483
             
         else:
             self.holesConstant = -1.2
-            self.bumpinessConstant = -0.184483
+            self.bumpinessConstant = -0.384483
             upper_bound = 10
             lower_bound = 2
 
