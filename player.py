@@ -83,10 +83,16 @@ class MyPlayer(Player):
     def calculate_mean(self, list):
         return sum(list) / len(list)
 
+    def check_height_of_board(self, originalBoard, board):
+        cloned_columns = self.generate_column_height(board)
+        original_columns = self.generate_column_height(originalBoard)
+
+        return (self.calculate_mean(cloned_columns) - self.calculate_mean(original_columns)) * -0.2
 
     def calc_score(self, originalBoard, board):
         total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board) + self.check_wells(board) 
         # + self.check_height_of_board(originalBoard, board)
+        #  + self.check_mean_height(board)
         return total
 
     def try_rotation(self,rotation, board):
@@ -123,19 +129,19 @@ class MyPlayer(Player):
         lower_bound = 2
         columns = self.generate_column_height(board)
         more_than_four = [column for column in columns if column >= 4]
-        moure_than_eight = [column for column in columns if column >= 6]
+        moure_than_eight = [column for column in columns if column >= 5]
         print(sum(columns) / len(columns))
         avg = sum(columns) / 8
-        if(len(more_than_four) >= 8 or avg > 3 or len(moure_than_eight) >= 2):
+        if(len(more_than_four) >= 6 or avg > 3.8 or len(moure_than_eight) >= 2):
             upper_bound = 10
             lower_bound = 0
             self.holesConstant = -0.55663 
             self.heightConstant = -0.610066
         else:
-            self.holesConstant = -2.4
-            self.heightConstant = -0.4
+            self.holesConstant = -2.0
+            self.heightConstant = -0.14
             upper_bound = 10
-            lower_bound = 3
+            lower_bound = 2
 
         
 
