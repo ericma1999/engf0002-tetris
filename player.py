@@ -80,8 +80,17 @@ class MyPlayer(Player):
                     tally[x] += 1
         return max(tally) * self.holesConstant
 
+    def calculate_mean(self, list):
+        return sum(list) / len(list)
+
+    def check_height_of_board(self, originalBoard, board):
+        cloned_columns = self.generate_column_height(board)
+        original_columns = self.generate_column_height(originalBoard)
+
+        return (self.calculate_mean(cloned_columns) - self.calculate_mean(original_columns)) * -0.2
+
     def calc_score(self, originalBoard, board):
-        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board) + self.check_wells(board) + self.check_min_max_difference(board)
+        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board) + self.check_wells(board) + self.check_height_of_board(originalBoard, board)
         #  + self.check_mean_height(board)
         return total
 
