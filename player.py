@@ -111,11 +111,11 @@ class MyPlayer(Player):
         self.moves += 1
         print("moves", self.moves)
         upper_bound = 10
-        lower_bound = 3
+        lower_bound = 2
         columns = self.generate_column_height(board)
-        more_than_four = [column for column in columns[0:7] if column >= 4]
-        moure_than_five = [column for column in columns[0:7] if column >= 5]
-        moure_than_six = [column for column in columns[0:7] if column >= 6]
+        more_than_four = [column for column in columns[0:7] if column >= 5]
+        moure_than_five = [column for column in columns[0:7] if column >= 7]
+        moure_than_six = [column for column in columns[0:7] if column >= 8]
         print(sum(columns) / len(columns))
         avg = sum(columns) / len(columns)
         if(len(more_than_four) >= 8 or len(moure_than_five) >= 4 or avg > 8):
@@ -123,13 +123,13 @@ class MyPlayer(Player):
             lower_bound = 0
             self.holesConstant = -1.2666
             self.heightConstant = -0.7
-            self.bumpinessConstant = -0.584483
+            self.bumpinessConstant = -0.384483
             
         else:
-            self.holesConstant = -0.8
+            self.holesConstant = -1.2
             self.bumpinessConstant = -0.184483
             upper_bound = 10
-            lower_bound = 3
+            lower_bound = 2
 
         for rotation in range(4):
             for horizontal_moves in range(lower_bound, upper_bound):
