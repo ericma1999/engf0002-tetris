@@ -18,6 +18,9 @@ class MyPlayer(Player):
     best_horizontal_position = None
     best_rotation_position = None
 
+    second_move = None
+    second_rotation = None
+
     def __init__(self, seed=None):
         self.random = Random(seed)
 
@@ -131,40 +134,45 @@ class MyPlayer(Player):
                 self.try_rotation(rotation, cloned_board)
                 self.try_moves(horizontal_moves, cloned_board)
                 calculated_score = self.calc_score(board,cloned_board)
+                
+                best_second_rotation = None
+                best_second_move = None
+                second_score = None
                 for second_rotation in range(4):
                     for second_horizontal_moves in range(board.width):
                         second_board = cloned_board.clone()
                         self.try_rotation(second_rotation, second_board)
                         self.try_moves(second_horizontal_moves, second_board)
 
-                        calculated_score += self.calc_score(cloned_board, second_board)
+                        calc_second_score = self.calc_score(cloned_board, second_board)
+                        if second_score is None:
+                            second_score = calc_second_score + calculated_score
+                            self.second_rotation = second_rotation
+                            self.second_move = 4 - second_horizontal_moves
+                            self.best_horizontal_position = 4 - horizontal_moves
+                            self.best_rotation_position = rotation
 
-
-                if (score is None):
-                    score = calculated_score
-                    self.best_rotation_position = rotation
-                    self.best_horizontal_position = 4 - horizontal_moves
-                
-                if (calculated_score > score):
-                    best_board = cloned_board
-                    self.best_rotation_position = rotation
-                    score = calculated_score
-                    self.best_horizontal_position = 4 - horizontal_moves
+                        if calc_second_score + calculated_score > second_score:
+                            self.second_rotation = second_rotation
+                            self.second_move = 4 - second_horizontal_moves
+                            self.best_horizontal_position = 4 - horizontal_moves
+                            self.best_rotation_position = rotation
+                        
     
 
     
     def simulate_best_position(self, board):
         self.test2(board)
     
-    def generate_moves(self):
+    def generate_moves(self, rotation, move):
         generated_moves = []
-        for _ in range(self.best_rotation_position):
+        for _ in range(rotation):
             generated_moves.append(Rotation.Anticlockwise)
-        if (self.best_horizontal_position < 0):
-            for _ in range(abs(self.best_horizontal_position)):
+        if (move < 0):
+            for _ in range(abs(move)):
                 generated_moves.append(Direction.Left)
         else:
-            for _ in range(self.best_horizontal_position):
+            for _ in range(move):
                 generated_moves.append(Direction.Right)
         generated_moves.append(Direction.Drop)
 
@@ -173,8 +181,14 @@ class MyPlayer(Player):
 
     def choose_action(self, board):
 
-        self.simulate_best_position(board)
-        return self.generate_moves()
+        if (self.second_move is not None and self.second_rotation is not None):
+            return self.generate_moves(self.second_rotation, self.second_move)
+            self.second_rotation = None
+            self.second_move = None
+        else:
+            self.simulate_best_position(board)
+
+        return self.generate_moves(self.best_rotation_position, self.best_horizontal_position)
 
 
 
