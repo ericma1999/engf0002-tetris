@@ -14,7 +14,7 @@ class MyPlayer(Player):
     linesConstant = 1.260666
     holesConstant = -0.35663
     bumpinessConstant = -0.184483
-    moves = 0
+
     best_horizontal_position = None
     best_rotation_position = None
 
@@ -42,6 +42,18 @@ class MyPlayer(Player):
             total += abs(columns[i] - columns[i+1])
         return total * self.bumpinessConstant
 
+    def check_empty_columns(self, board):
+        columns = self.generate_column_height(board)
+        empty_columns = [False] * 10
+        for x in range(board.width):
+            for y in range(board.height - columns[x], board.height):
+                if(x,y) in board.cells:
+                    empty_columns[x] += True
+
+        empty_columns = len([column for column in empty_columns if column == False])
+
+        return empty_columns * -0.3
+
     def check_lines(self, originalBoard, board):
         score = board.score - originalBoard.score
         complete_line = 0
@@ -50,8 +62,8 @@ class MyPlayer(Player):
             complete_line += 4
         elif score >= 800:
             complete_line += 3
-        # elif score >= 400:
-        #     complete_line += 2
+        elif score >= 400:
+            complete_line += 2
         # elif score >= 100:
         #     complete_line += 1
         return complete_line * self.linesConstant
@@ -78,20 +90,10 @@ class MyPlayer(Player):
             for y in range(board.height - columns[x], board.height):
                 if(x,y) not in board.cells:
                     tally[x] += 1
-        return max(tally) * self.holesConstant * 1.5
-
-    def calculate_mean(self, list):
-        return sum(list) / len(list)
-
-    def check_height_of_board(self, originalBoard, board):
-        cloned_columns = self.generate_column_height(board)
-        original_columns = self.generate_column_height(originalBoard)
-
-        return (self.calculate_mean(cloned_columns) - self.calculate_mean(original_columns)) * -0.2
+        return max(tally) * self.holesConstant
 
     def calc_score(self, originalBoard, board):
-        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board) + self.check_wells(board) 
-        # + self.check_height_of_board(originalBoard, board)
+        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board) + self.check_wells(board) + self.check_empty_columns(board)
         #  + self.check_mean_height(board)
         return total
 
@@ -123,32 +125,9 @@ class MyPlayer(Player):
 
     def simulate_best_position(self, board):
         score = None
-        self.moves +=1
-        print("moves", self.moves)
-        upper_bound = 10
-        lower_bound = 2
-        columns = self.generate_column_height(board)
-        more_than_four = [column for column in columns if column >= 4]
-        moure_than_eight = [column for column in columns if column >= 6]
-        print(sum(columns) / len(columns))
-        avg = sum(columns) / 8
-        if(len(more_than_four) >= 6 or avg > 3.8 or len(moure_than_eight) >= 2):
-            upper_bound = 10
-            lower_bound = 0
-            self.holesConstant = -0.55663 
-            self.heightConstant = -0.610066
-        else:
-            self.holesConstant = -2.0
-            self.heightConstant = -0.14
-            upper_bound = 10
-            lower_bound = 3
-
-        
-
         for rotation in range(4):
-            for horizontal_moves in range(lower_bound, upper_bound):
+            for horizontal_moves in range(board.width):
                 cloned_board = board.clone()
-                
                 self.try_rotation(rotation, cloned_board)
                 self.try_moves(horizontal_moves, cloned_board)
 
