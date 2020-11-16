@@ -12,9 +12,8 @@ class MyPlayer(Player):
     # heuristic constants
     heightConstant = -0.510066
     linesConstant = 1.260666
-    holesConstant = -0.45663
+    holesConstant = -0.55663
     bumpinessConstant = -0.184483
-    moves = 0
 
     best_horizontal_position = None
     best_rotation_position = None
@@ -65,7 +64,7 @@ class MyPlayer(Player):
             for y in range(board.height - columns[x], board.height):
                 if (x, y) not in board.cells:
                         tally[x] += 1
-        return self.holesConstant * sum(tally) * 1.5
+        return self.holesConstant * sum(tally)
 
     def check_wells(self, board):
         columns = self.generate_column_height(board)
@@ -74,7 +73,7 @@ class MyPlayer(Player):
             for y in range(board.height - columns[x], board.height):
                 if(x,y) not in board.cells:
                     tally[x] += 1
-        return max(tally) * self.holesConstant * 1.2
+        return max(tally) * self.holesConstant
 
     def calc_score(self, originalBoard, board):
         total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board) + self.check_wells(board)
@@ -108,39 +107,46 @@ class MyPlayer(Player):
                 pass
 
     def simulate_best_position(self, board):
-        self.moves += 1
-        print("current move", self.moves)
         score = None
-        height_columns = self.generate_column_height(board)
-        print(height_columns)
-        avg_height = sum(height_columns[0:7]) / 8
-        upper_bound = 10
-        lower_bound = 3
-        print(avg_height)
-        if (avg_height > 6):
-            upper_bound = 10
-            lower_bound = 0
-        else:
-            upper_bound = 10
-            lower_bound = 2
+        previous_rotation = None
+        previous_move = None
+
         for rotation in range(4):
-            for horizontal_moves in range(lower_bound, upper_bound):
+            for horizontal_moves in range(board.width):
                 cloned_board = board.clone()
-                self.try_rotation(rotation, cloned_board)
-                self.try_moves(horizontal_moves, cloned_board)
+                print("firt shape",cloned_board.falling.cells)
+                temp_previous_rotation = None
+                temp_previous_move = None
+                for i in range(2):
+                    self.try_rotation(rotation, cloned_board)
+                    self.try_moves(horizontal_moves, cloned_board)
+                    
+                    if (i == 0 and score is None):
+                        
+                        previous_rotation = rotation
+                        previous_move = 4 - horizontal_moves
+                        temp_previous_rotation = None
+                        temp_previous_move = None
 
-                calculated_score = self.calc_score(board,cloned_board)
+                    if i == 0:
+                        temp_previous_move = 4 - horizontal_moves
+                        temp_previous_rotation = rotation
+                        # print("next shape",cloned_board.falling.cells)
 
-                if (score is None):
-                    score = calculated_score
-                    self.best_rotation_position = rotation
-                    self.best_horizontal_position = 4 - horizontal_moves
+
+                    if (i == 1):
+                        calculated_score = self.calc_score(board, cloned_board)
+                        if (score is None):
+                            score = calculated_score
+                            self.best_rotation_position = previous_rotation
+                            self.best_horizontal_position = previous_move
                 
-                if (calculated_score > score):
-                    best_board = cloned_board
-                    self.best_rotation_position = rotation
-                    score = calculated_score
-                    self.best_horizontal_position = 4 - horizontal_moves
+                        if (calculated_score > score):
+                            score = calculated_score
+                            previous_rotation = temp_previous_rotation
+                            previous_move = temp_previous_move
+            self.best_horizontal_position = previous_move
+            self.best_rotation_position = previous_rotation
     
     def generate_moves(self):
         generated_moves = []
@@ -158,8 +164,8 @@ class MyPlayer(Player):
     
 
     def choose_action(self, board):
-
         self.simulate_best_position(board)
+        
         return self.generate_moves()
 
 
