@@ -129,7 +129,7 @@ class MyPlayer(Player):
         lower_bound = 2
         columns = self.generate_column_height(board)
         more_than_four = [column for column in columns if column >= 4]
-        moure_than_eight = [column for column in columns if column >= 5]
+        moure_than_eight = [column for column in columns if column >= 6]
         print(sum(columns) / len(columns))
         avg = sum(columns) / 8
         if(len(more_than_four) >= 6 or avg > 3.8 or len(moure_than_eight) >= 2):
@@ -141,7 +141,7 @@ class MyPlayer(Player):
             self.holesConstant = -2.0
             self.heightConstant = -0.14
             upper_bound = 10
-            lower_bound = 2
+            lower_bound = 3
 
         
 
