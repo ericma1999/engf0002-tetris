@@ -132,7 +132,7 @@ class MyPlayer(Player):
         moure_than_eight = [column for column in columns if column >= 6]
         print(sum(columns) / len(columns))
         avg = sum(columns) / 8
-        if(len(more_than_four) >= 5 or avg > 4 or len(moure_than_eight) >= 2):
+        if(len(more_than_four) >= 6 or avg > 3.8 or len(moure_than_eight) >= 2):
             upper_bound = 10
             lower_bound = 0
             self.holesConstant = -0.55663 
