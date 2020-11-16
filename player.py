@@ -118,13 +118,13 @@ class MyPlayer(Player):
         print(sum(columns) / len(columns))
         avg = sum(columns) / 8
         print("current avg", avg)
-        if(avg > 5.1 or len(moure_than_eight) >= 6):
+        if(avg > 4.0 or len(more_than_four) >= 5):
             print("inside avg")
             upper_bound = 10
             lower_bound = 0
-            self.holesConstant = -1.5666
+            # self.holesConstant = -1.2666
         else:
-            self.holesConstant = -2.0
+            # self.holesConstant = -2.0
             upper_bound = 10
             lower_bound = 2
         print(lower_bound)
