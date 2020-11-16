@@ -12,7 +12,7 @@ class MyPlayer(Player):
     # heuristic constants
     heightConstant = -0.510066
     linesConstant = 1.260666
-    holesConstant = -0.35663
+    holesConstant = -0.55663
     bumpinessConstant = -0.184483
 
     best_horizontal_position = None
@@ -42,6 +42,18 @@ class MyPlayer(Player):
             total += abs(columns[i] - columns[i+1])
         return total * self.bumpinessConstant
 
+    def check_empty_columns(self, board):
+        columns = self.generate_column_height(board)
+        empty_columns = [False] * 10
+        for x in range(board.width):
+            for y in range(board.height - columns[x], board.height):
+                if(x,y) in board.cells:
+                    empty_columns[x] += True
+
+        empty_columns = len([column for column in empty_columns if column == False])
+
+        return empty_columns * -0.3
+
     def check_lines(self, originalBoard, board):
         score = board.score - originalBoard.score
         complete_line = 0
@@ -55,7 +67,13 @@ class MyPlayer(Player):
         # elif score >= 100:
         #     complete_line += 1
         return complete_line * self.linesConstant
-        
+    
+    def check_min_max_difference(self, board):
+        columns = self.generate_column_height(board)
+
+        return max(columns) - min(columns) * -0.3466
+
+    
     def check_holes(self, board):
         columns = self.generate_column_height(board)
         tally = [0] * 10 
@@ -75,7 +93,7 @@ class MyPlayer(Player):
         return max(tally) * self.holesConstant
 
     def calc_score(self, originalBoard, board):
-        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board) + self.check_wells(board)
+        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board) + self.check_wells(board) + self.check_empty_columns(board)
         #  + self.check_mean_height(board)
         return total
 
@@ -105,15 +123,22 @@ class MyPlayer(Player):
             except NoBlockException:
                 pass
 
-    def simulate_best_position(self, board):
+    def test2(self, board):
         score = None
         for rotation in range(4):
             for horizontal_moves in range(board.width):
                 cloned_board = board.clone()
                 self.try_rotation(rotation, cloned_board)
                 self.try_moves(horizontal_moves, cloned_board)
-
                 calculated_score = self.calc_score(board,cloned_board)
+                for second_rotation in range(4):
+                    for second_horizontal_moves in range(board.width):
+                        second_board = cloned_board.clone()
+                        self.try_rotation(second_rotation, second_board)
+                        self.try_moves(second_horizontal_moves, second_board)
+
+                        calculated_score += self.calc_score(cloned_board, second_board)
+
 
                 if (score is None):
                     score = calculated_score
@@ -125,6 +150,11 @@ class MyPlayer(Player):
                     self.best_rotation_position = rotation
                     score = calculated_score
                     self.best_horizontal_position = 4 - horizontal_moves
+    
+
+    
+    def simulate_best_position(self, board):
+        self.test2(board)
     
     def generate_moves(self):
         generated_moves = []
