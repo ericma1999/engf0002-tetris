@@ -10,10 +10,12 @@ class Player:
         raise NotImplementedError
 class MyPlayer(Player):
     # heuristic constants
-    heightConstant = -0.510066
-    linesConstant = 0.960666
-    holesConstant = -0.65663
+    heightConstant = -0.410066
+    linesConstant = 0.860666
+    holesConstant = -0.45663
     bumpinessConstant = -0.184483
+
+    moves = 0
 
     best_horizontal_position = None
     best_rotation_position = None
@@ -55,11 +57,6 @@ class MyPlayer(Player):
         # elif score >= 100:
         #     complete_line += 1
         return complete_line * self.linesConstant
-    
-    def check_min_max_difference(self, board):
-        columns = self.generate_column_height(board)
-
-        return max(columns) - min(columns) * -0.3466
 
     
     def check_holes(self, board):
@@ -113,6 +110,8 @@ class MyPlayer(Player):
 
     def simulate_best_position(self, board):
         score = None
+        self.moves += 1
+        print("moves", self.moves)
         for rotation in range(4):
             for horizontal_moves in range(board.width):
                 cloned_board = board.clone()
