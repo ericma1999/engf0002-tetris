@@ -119,7 +119,7 @@ class MyPlayer(Player):
 
         avg = sum(columns) / len(columns)
 
-        if avg > 4:
+        if avg > 3:
             self.linesConstant = 1.3
         else:
             self.linesConstant = 0.8
