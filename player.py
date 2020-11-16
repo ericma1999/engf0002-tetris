@@ -11,7 +11,7 @@ class Player:
 class MyPlayer(Player):
     # heuristic constants
     heightConstant = -0.510066
-    linesConstant = 0.960666
+    linesConstant = 0.660666
     holesConstant = -0.35663
     bumpinessConstant = -0.184483
 
