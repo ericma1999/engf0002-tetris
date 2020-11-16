@@ -12,8 +12,9 @@ class MyPlayer(Player):
     # heuristic constants
     heightConstant = -0.510066
     linesConstant = 1.260666
-    holesConstant = -0.35663
+    holesConstant = -0.45663
     bumpinessConstant = -0.184483
+    moves = 0
 
     best_horizontal_position = None
     best_rotation_position = None
@@ -75,13 +76,8 @@ class MyPlayer(Player):
                     tally[x] += 1
         return max(tally) * self.holesConstant
 
-    def check_empty_columns(self, board):
-        columns = self.generate_column_height(board)
-        no_of_empty_columns = len([column for column in columns if column == 0])
-        return no_of_empty_columns * -0.10
-
     def calc_score(self, originalBoard, board):
-        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board) + self.check_wells(board) + self.check_empty_columns(board)
+        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board) + self.check_wells(board)
         #  + self.check_mean_height(board)
         return total
 
@@ -112,9 +108,23 @@ class MyPlayer(Player):
                 pass
 
     def simulate_best_position(self, board):
+        self.moves += 1
+        print("current move", self.moves)
         score = None
+        height_columns = self.generate_column_height(board)
+        print(height_columns)
+        avg_height = sum(height_columns[0:7]) / 8
+        upper_bound = 10
+        lower_bound = 3
+        print(avg_height)
+        if (avg_height > 4):
+            upper_bound = 10
+            lower_bound = 0
+        else:
+            upper_bound = 10
+            lower_bound = 2
         for rotation in range(4):
-            for horizontal_moves in range(board.width):
+            for horizontal_moves in range(lower_bound, upper_bound):
                 cloned_board = board.clone()
                 self.try_rotation(rotation, cloned_board)
                 self.try_moves(horizontal_moves, cloned_board)
