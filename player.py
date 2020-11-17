@@ -11,15 +11,12 @@ class Player:
 class MyPlayer(Player):
     # heuristic constants
     heightConstant = -0.510066
-    linesConstant = 0.660666
+    linesConstant = 0.960666
     holesConstant = -0.35663
     bumpinessConstant = -0.184483
 
     best_horizontal_position = None
     best_rotation_position = None
-
-    second_move = None
-    second_rotation = None
 
     def __init__(self, seed=None):
         self.random = Random(seed)
@@ -55,8 +52,8 @@ class MyPlayer(Player):
             complete_line += 3
         elif score >= 400:
             complete_line += 2
-        elif score >= 100:
-            complete_line += 1
+        # elif score >= 100:
+        #     complete_line += 1
         return complete_line * self.linesConstant
     
     def check_min_max_difference(self, board):
@@ -83,37 +80,9 @@ class MyPlayer(Player):
                     tally[x] += 1
         return max(tally) * self.holesConstant
 
-    def check_row_transitions(self, board):
-        columns = self.generate_column_height(board)
-        transitions = 0
-        for x in range(board.width):
-            for y in range(board.height - columns[x], board.height):
-                if(x,y) not in board.cells:
-                    if x == 0:
-                        if (x +1, y) not in board.cells:
-                            transitions += 1
-                    elif x == 9:
-                        if (x- 1,y) not in board.cells:
-                            transitions += 1
-                    else:
-                        if (x+1,y) in board.cells:
-                            transitions += 1
-                        elif (x - 1,y) in board.cells:
-                            transitions += 1
-        return transitions * -0.3
-
-    def check_board_difference(self, originalBoard, board):
-        original_columns = self.generate_column_height(originalBoard)
-        original_avg = sum(original_columns) / len(original_columns)
-
-        cloned_columns = self.generate_column_height(board)
-        cloned_avg = sum(cloned_columns) / len(cloned_columns)
-
-        return (cloned_avg - original_avg) * -0.7
-
     def calc_score(self, originalBoard, board):
-        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board) + self.check_wells(board) 
-        + self.check_row_transitions(board) + self.check_board_difference(originalBoard, board)
+        total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board) + self.check_wells(board)
+        #  + self.check_mean_height(board)
         return total
 
     def try_rotation(self,rotation, board):
@@ -149,38 +118,29 @@ class MyPlayer(Player):
                 cloned_board = board.clone()
                 self.try_rotation(rotation, cloned_board)
                 self.try_moves(horizontal_moves, cloned_board)
+
                 calculated_score = self.calc_score(board,cloned_board)
 
-                for second_rotation in range(4):
-                    for second_horizontal_moves in range(board.width):
-                        second_board = cloned_board.clone()
-                        self.try_rotation(second_rotation, second_board)
-                        self.try_moves(second_horizontal_moves, second_board)
-
-                        calc_second_score = self.calc_score(cloned_board, second_board)
-                        if score is None:
-                            score = calc_second_score + calculated_score
-                            self.second_rotation = second_rotation
-                            self.second_move = 4 - second_horizontal_moves
-                            self.best_horizontal_position = 4 - horizontal_moves
-                            self.best_rotation_position = rotation
-
-                        if calc_second_score + calculated_score > score:
-                            score = calc_second_score + calculated_score
-                            self.second_rotation = second_rotation
-                            self.second_move = 4 - second_horizontal_moves
-                            self.best_horizontal_position = 4 - horizontal_moves
-                            self.best_rotation_position = rotation
+                if (score is None):
+                    score = calculated_score
+                    self.best_rotation_position = rotation
+                    self.best_horizontal_position = 4 - horizontal_moves
+                
+                if (calculated_score > score):
+                    best_board = cloned_board
+                    self.best_rotation_position = rotation
+                    score = calculated_score
+                    self.best_horizontal_position = 4 - horizontal_moves
     
-    def generate_moves(self):
+    def generate_moves(self, rotation, move):
         generated_moves = []
-        for _ in range(self.best_rotation_position):
+        for _ in range(rotation):
             generated_moves.append(Rotation.Anticlockwise)
         if (self.best_horizontal_position < 0):
-            for _ in range(abs(self.best_horizontal_position)):
+            for _ in range(abs(move)):
                 generated_moves.append(Direction.Left)
         else:
-            for _ in range(self.best_horizontal_position):
+            for _ in range(move):
                 generated_moves.append(Direction.Right)
         generated_moves.append(Direction.Drop)
 
