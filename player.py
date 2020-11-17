@@ -15,6 +15,8 @@ class MyPlayer(Player):
     holesConstant = -0.35663
     bumpinessConstant = -0.184483
 
+    moves = 0
+
     best_horizontal_position = None
     best_rotation_position = None
 
@@ -160,7 +162,10 @@ class MyPlayer(Player):
     
 
     def choose_action(self, board):
-
+        self.moves += 1
+        if (self.moves == 400):
+            raise "Test"
+        print("moves", self.moves)
         if (self.second_move is not None and self.second_rotation is not None):
             print("if")
             print(self.second_move)
