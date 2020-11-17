@@ -11,9 +11,9 @@ class Player:
 class MyPlayer(Player):
     # heuristic constants
     heightConstant = -0.510066
-    linesConstant = 1.260666
-    holesConstant = -0.35663
-    bumpinessConstant = -0.184483
+    linesConstant = 0.960666
+    holesConstant = -0.75663
+    bumpinessConstant = -0.284483
 
     moves = 0
 
@@ -123,7 +123,7 @@ class MyPlayer(Player):
         upper = 10
         lower = 2
         avg = sum(columns) / len(columns)
-        if (avg > 4):
+        if (avg > 3.8):
             upper = 10
             lower = 0
         else:
