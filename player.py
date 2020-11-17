@@ -123,7 +123,7 @@ class MyPlayer(Player):
         upper = 10
         lower = 2
         avg = sum(columns) / len(columns)
-        if (avg > 3.8):
+        if (avg > 3.5):
             upper = 10
             lower = 0
         else:
