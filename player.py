@@ -131,10 +131,10 @@ class MyPlayer(Player):
             upper_bound = 10
             lower_bound = 0
             self.holesConstant = -0.55663 
-            self.heightConstant = -0.610066
+            # self.heightConstant = -0.610066
         else:
             self.holesConstant = -2.0
-            self.heightConstant = -0.14
+            # self.heightConstant = -0.14
             upper_bound = 10
             lower_bound = 3
 
@@ -185,7 +185,6 @@ class MyPlayer(Player):
         self.moves += 1
         print("moves", self.moves)
         if (self.second_move is not None and self.second_rotation is not None):
-            print("if")
             print(self.second_move)
 
             rotation = self.second_rotation
