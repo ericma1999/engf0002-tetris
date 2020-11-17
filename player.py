@@ -183,8 +183,6 @@ class MyPlayer(Player):
 
     def choose_action(self, board):
         self.moves += 1
-        if (self.moves == 400):
-            raise "Test"
         print("moves", self.moves)
         if (self.second_move is not None and self.second_rotation is not None):
             print("if")
