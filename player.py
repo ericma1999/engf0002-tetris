@@ -119,21 +119,22 @@ class MyPlayer(Player):
     def simulate_best_position(self, board):
         score = None
         print("current move", self.moves)
-        columns = self.generate_column_height(board)[0:7]
+        columns = self.generate_column_height(board)
         upper = 10
-        lower = 3
-        avg = sum(columns) / len(columns)
-        if (avg > 3.5):
-            self.linesConstant = 0.86
-            self.heightConstant = -0.9
+        lower = 2
+        avg = sum(columns[0:7]) / 8
+        all_avg = sum(columns) / len(columns)
+        if (avg >=4 or all_avg > 5):
+            self.linesConstant = 1.46
+            self.heightConstant = -1.4
             self.holesConstant = -1.0
             upper = 10
             lower = 0
         else:
             self.linesConstant = -0.962
             self.heightConstant = -0.410066
-            self.holesConstant = -0.75663
-            lower = 3
+            self.holesConstant = -0.95663
+            lower = 2
 
 
         for rotation in range(4):
