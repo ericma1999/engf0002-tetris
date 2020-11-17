@@ -11,7 +11,7 @@ class Player:
 class MyPlayer(Player):
     # heuristic constants
     heightConstant = -0.510066
-    linesConstant = 0.960666
+    linesConstant = -0.960666
     holesConstant = -0.75663
     bumpinessConstant = -0.284483
 
@@ -64,7 +64,7 @@ class MyPlayer(Player):
     def check_min_max_difference(self, board):
         columns = self.generate_column_height(board)
 
-        return max(columns) - min(columns) * -0.3466
+        return max(columns) - min(columns) * -0.2466
 
     
     def check_holes(self, board):
