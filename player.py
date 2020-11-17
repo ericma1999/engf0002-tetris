@@ -17,6 +17,7 @@ class MyPlayer(Player):
 
     best_horizontal_position = None
     best_rotation_position = None
+
     second_move = None
     second_rotation = None
 
@@ -147,7 +148,7 @@ class MyPlayer(Player):
         generated_moves = []
         for _ in range(rotation):
             generated_moves.append(Rotation.Anticlockwise)
-        if (self.best_horizontal_position < 0):
+        if (move < 0):
             for _ in range(abs(move)):
                 generated_moves.append(Direction.Left)
         else:

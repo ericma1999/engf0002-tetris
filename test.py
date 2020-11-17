@@ -1,4 +1,5 @@
-score = None
+def test2(self, board):
+        score = None
         for rotation in range(4):
             for horizontal_moves in range(board.width):
                 cloned_board = board.clone()
@@ -29,8 +30,9 @@ score = None
 
 
 
+def choose_action(self, board):
 
-if (self.second_move is not None and self.second_rotation is not None):
+        if (self.second_move is not None and self.second_rotation is not None):
             print("if")
             print(self.second_move)
 
