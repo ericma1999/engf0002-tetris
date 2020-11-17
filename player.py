@@ -118,15 +118,35 @@ class MyPlayer(Player):
 
     def simulate_best_position(self, board):
         score = None
+        self.moves +=1
+        print("moves", self.moves)
+        upper_bound = 10
+        lower_bound = 2
+        columns = self.generate_column_height(board)
+        more_than_four = [column for column in columns if column >= 4]
+        moure_than_eight = [column for column in columns if column >= 6]
+        print(sum(columns) / len(columns))
+        avg = sum(columns) / 8
+        if(len(more_than_four) >= 6 or avg > 3.8 or len(moure_than_eight) >= 2):
+            upper_bound = 10
+            lower_bound = 0
+            self.holesConstant = -0.55663 
+            self.heightConstant = -0.610066
+        else:
+            self.holesConstant = -2.0
+            self.heightConstant = -0.14
+            upper_bound = 10
+            lower_bound = 3
+
         for rotation in range(4):
-            for horizontal_moves in range(board.width):
+            for horizontal_moves in range(lower_bound, upper_bound):
                 cloned_board = board.clone()
                 self.try_rotation(rotation, cloned_board)
                 self.try_moves(horizontal_moves, cloned_board)
                 calculated_score = self.calc_score(board,cloned_board)
 
                 for second_rotation in range(4):
-                    for second_horizontal_moves in range(board.width):
+                    for second_horizontal_moves in range(lower_bound, upper_bound):
                         second_board = cloned_board.clone()
                         self.try_rotation(second_rotation, second_board)
                         self.try_moves(second_horizontal_moves, second_board)
