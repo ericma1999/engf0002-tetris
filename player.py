@@ -10,7 +10,7 @@ class Player:
         raise NotImplementedError
 class MyPlayer(Player):
     # heuristic constants
-    heightConstant = -0.510066
+    heightConstant = -0.410066
     linesConstant = -0.960666
     holesConstant = -0.75663
     bumpinessConstant = -0.284483
@@ -83,7 +83,7 @@ class MyPlayer(Player):
             for y in range(board.height - columns[x], board.height):
                 if(x,y) not in board.cells:
                     tally[x] += 1
-        return max(tally) * self.holesConstant
+        return max(tally) * self.holesConstant * 1.2
 
     def calc_score(self, originalBoard, board):
         total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board) + self.check_wells(board)
@@ -119,15 +119,21 @@ class MyPlayer(Player):
     def simulate_best_position(self, board):
         score = None
         print("current move", self.moves)
-        columns = self.generate_column_height(board)
+        columns = self.generate_column_height(board)[0:7]
         upper = 10
-        lower = 2
+        lower = 3
         avg = sum(columns) / len(columns)
         if (avg > 3.5):
+            self.linesConstant = 0.86
+            self.heightConstant = -0.9
+            self.holesConstant = -1.0
             upper = 10
             lower = 0
         else:
-            lower = 2
+            self.linesConstant = -0.962
+            self.heightConstant = -0.410066
+            self.holesConstant = -0.75663
+            lower = 3
 
 
         for rotation in range(4):
@@ -185,7 +191,6 @@ class MyPlayer(Player):
             self.second_rotation = None
             return self.generate_moves(rotation, move)
         else:
-            print("else")
             self.simulate_best_position(board)
             return self.generate_moves(self.best_rotation_position, self.best_horizontal_position)
 
