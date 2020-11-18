@@ -14,7 +14,6 @@ class MyPlayer(Player):
     linesConstant = -0.960666
     holesConstant = -0.75663
     bumpinessConstant = -0.284483
-    wellsConstnat = -0.3
 
     moves = 0
 
@@ -58,8 +57,8 @@ class MyPlayer(Player):
             complete_line += 3
         elif score >= 400:
             complete_line += 2
-        elif score >= 100:
-            complete_line += 1
+        # elif score >= 100:
+        #     complete_line += 1
         return complete_line * self.linesConstant
     
     def check_min_max_difference(self, board):
@@ -84,7 +83,7 @@ class MyPlayer(Player):
             for y in range(board.height - columns[x], board.height):
                 if(x,y) not in board.cells:
                     tally[x] += 1
-        return max(tally) * self.wellsConstnat
+        return max(tally) * -1.0
 
     def calc_score(self, originalBoard, board):
         total = self.check_height(board) + self.check_holes(board) + self.check_lines(originalBoard, board) + self.check_bumpiness(board) + self.check_wells(board)
@@ -117,6 +116,7 @@ class MyPlayer(Player):
             except NoBlockException:
                 pass
 
+
     def simulate_best_position(self, board):
         score = None
         columns = self.generate_column_height(board)
@@ -124,23 +124,16 @@ class MyPlayer(Player):
         lower = 2
         avg = sum(columns[0:7]) / 8
         all_avg = sum(columns) / len(columns)
-        if (avg >= 3.8):
+        if (avg >= 3.6 or all_avg > 4):
             self.linesConstant = 1.46
-            self.heightConstant = -0.8
-            self.holesConstant = -1.2
-            upper = 8
+            self.heightConstant = -1.4
+            self.holesConstant = -1.0
+            upper = 10
             lower = 0
-            if all_avg > 4:
-                self.heightConstant = -1.2
-                self.holesConstant = -0.9
-                upper = 10
-        if (all_avg > 5):
-            self.heightConstant = -2.0
-            self.wellsConstnat = -0.9
         else:
             self.linesConstant = -0.962
             self.heightConstant = -0.410066
-            self.holesConstant = -1.5663
+            self.holesConstant = -0.95663
             lower = 2
 
 
@@ -191,6 +184,7 @@ class MyPlayer(Player):
         self.moves += 1
         print("moves", self.moves)
         if (self.second_move is not None and self.second_rotation is not None):
+            print(self.second_move)
 
             rotation = self.second_rotation
             move = self.second_move
