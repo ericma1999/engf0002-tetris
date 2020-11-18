@@ -120,19 +120,21 @@ class MyPlayer(Player):
     def simulate_best_position(self, board):
         score = None
         columns = self.generate_column_height(board)
+        columns_more_than_six = [column for column in columns if column > 6]
+        columns_more_than_eight = [column for column in columns if column > 8]
         upper = 10
         lower = 2
         avg = sum(columns[0:7]) / 8
         all_avg = sum(columns) / len(columns)
-        if (avg >= 3.5):
-            # self.linesConstant = 1.46
+        if (avg >= 3 or len(columns_more_than_six) > 2 or len(columns_more_than_eight) > 1):
+            self.linesConstant = 1.46
             self.heightConstant = -0.8
             self.holesConstant = -1.2
             upper = 10
             lower = 0
         else:
             # self.linesConstant = -0.962
-            self.heightConstant = -0.610066
+            self.heightConstant = -0.510066
             self.holesConstant = -1.5663
             lower = 2
 
