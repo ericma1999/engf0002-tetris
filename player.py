@@ -126,7 +126,7 @@ class MyPlayer(Player):
         lower = 2
         avg = sum(columns[0:7]) / 8
         all_avg = sum(columns) / len(columns)
-        if (avg >= 3 or len(columns_more_than_six) > 2 or len(columns_more_than_eight) > 1):
+        if (avg >= 4 or len(columns_more_than_six) > 3 or len(columns_more_than_eight) > 2):
             self.linesConstant = 1.46
             self.heightConstant = -0.8
             self.holesConstant = -1.2
